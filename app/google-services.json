@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "89776810146",
+    "project_id": "queue-41f76",
+    "storage_bucket": "queue-41f76.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:89776810146:android:abdccdc3ade6c22d370ffb",
+        "android_client_info": {
+          "package_name": "com.example.queue"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDOllh3mPwguc8mKEIU9nn28VAxT-1OkKs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
