@@ -27,7 +27,9 @@ object FirebaseAccount {
             } else {
                 if (it.exception is com.google.firebase.auth.FirebaseAuthWeakPasswordException){
                     listener.onErrorFinished("В пароле должно быть не меньше 6 символов!")
+                    return@addOnCompleteListener
                 }
+                listener.onErrorFinished(it.exception.toString())
                 Log.i("firebase", it.exception.toString())
             }
         }

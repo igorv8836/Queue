@@ -10,10 +10,9 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import com.example.queue.R
-import com.example.queue.databinding.FragmentAuthBinding
 import com.example.queue.databinding.FragmentRegisterBinding
-import com.example.queue.viewmodels.AuthViewModel
 import com.example.queue.viewmodels.RegisterViewModel
+import com.google.android.material.snackbar.Snackbar
 
 class RegisterFragment : Fragment() {
     private lateinit var viewModel: RegisterViewModel
@@ -28,28 +27,24 @@ class RegisterFragment : Fragment() {
         viewModel = ViewModelProvider(this)[RegisterViewModel::class.java]
         navController = findNavController()
 
+        binding.editTextEmailInputText.setText(arguments?.getString("email") ?: "")
+        binding.editTextPasswordInputText.setText(arguments?.getString("password") ?: "")
+
         binding.registerButton.setOnClickListener{
             viewModel.registerAccount(
                 binding.editTextEmailInputText.text.toString(),
                 binding.editTextPasswordInputText.text.toString(),
-                binding.editTextNicknameInputText.text.toString()
-            )
+                binding.editTextNicknameInputText.text.toString())
         }
 
-        viewModel.nextFragment.observe(viewLifecycleOwner) {
-            if (it) {
+        viewModel.navigateToBaseFragment.observe(viewLifecycleOwner) {
+            if (it)
                 navController.navigate(R.id.action_registerFragment_to_newsFragment)
-            }
         }
 
         viewModel.errorText.observe(viewLifecycleOwner) {
-            Toast.makeText(requireContext(), viewModel.errorText.value, Toast.LENGTH_LONG).show()
+            Snackbar.make(binding.root, viewModel.errorText.value.toString(), Snackbar.LENGTH_LONG).show()
         }
-
-        binding.editTextEmailInputText.setText(
-            arguments?.getString("email") ?: "")
-        binding.editTextPasswordInputText.setText(
-            arguments?.getString("password") ?: "")
     }
 
     override fun onCreateView(
