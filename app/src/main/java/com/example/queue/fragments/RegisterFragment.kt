@@ -4,18 +4,59 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.NavController
+import androidx.navigation.fragment.findNavController
 import com.example.queue.R
+import com.example.queue.databinding.FragmentAuthBinding
+import com.example.queue.databinding.FragmentRegisterBinding
+import com.example.queue.viewmodels.AuthViewModel
+import com.example.queue.viewmodels.RegisterViewModel
 
 class RegisterFragment : Fragment() {
+    private lateinit var viewModel: RegisterViewModel
+    private lateinit var navController: NavController
+    private lateinit var binding: FragmentRegisterBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+    }
+
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+        viewModel = ViewModelProvider(this)[RegisterViewModel::class.java]
+        navController = findNavController()
+
+        binding.registerButton.setOnClickListener{
+            viewModel.registerAccount(
+                binding.editTextEmailInputText.text.toString(),
+                binding.editTextPasswordInputText.text.toString(),
+                binding.editTextNicknameInputText.text.toString()
+            )
+        }
+
+        viewModel.nextFragment.observe(viewLifecycleOwner) {
+            if (it) {
+                navController.navigate(R.id.action_registerFragment_to_newsFragment)
+            }
+        }
+
+        viewModel.errorText.observe(viewLifecycleOwner) {
+            Toast.makeText(requireContext(), viewModel.errorText.value, Toast.LENGTH_LONG).show()
+        }
+
+        binding.editTextEmailInputText.setText(
+            arguments?.getString("email") ?: "")
+        binding.editTextPasswordInputText.setText(
+            arguments?.getString("password") ?: "")
     }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_register, container, false)
+        binding = FragmentRegisterBinding.inflate(layoutInflater, container, false)
+        return binding.root
     }
 }

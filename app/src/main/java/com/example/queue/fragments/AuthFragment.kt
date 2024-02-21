@@ -6,34 +6,43 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.navigation.NavController
+import androidx.navigation.fragment.findNavController
 import com.example.queue.viewmodels.AuthViewModel
 import com.example.queue.R
+import com.example.queue.databinding.FragmentAuthBinding
 
 class AuthFragment : Fragment() {
-
-    companion object {
-        fun newInstance() = AuthFragment()
-    }
-
     private lateinit var viewModel: AuthViewModel
+    private lateinit var navController: NavController
+    private lateinit var binding: FragmentAuthBinding
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_auth, container, false)
+        binding = FragmentAuthBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        viewModel = ViewModelProvider(this).get(AuthViewModel::class.java)
-        // TODO: Use the ViewModel
+        viewModel = ViewModelProvider(this)[AuthViewModel::class.java]
+        navController = findNavController()
+
+        binding.registerButton.setOnClickListener{
+            val bundle = Bundle()
+            bundle.putString(
+                "email",
+                binding.editTextEmailInputText.text.toString())
+            bundle.putString(
+                "password",
+                binding.editTextPasswordInputText.text.toString())
+            navController.navigate(R.id.action_authFragment_to_registerFragment, bundle)
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-//        val navController = findNavController()
-//        navController.navigate(R.id.action_authFragment_to_registerFragment)
     }
 }
