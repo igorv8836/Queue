@@ -7,4 +7,14 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="red">#FF0000</color>
+
+    <!-- Основной цвет для моего стиля -->
+    <color name="blue_300">#00cbfe</color>
+    <color name="blue_500">#00b3ff</color>
+
+    <!-- Дополнительный цвет и его оттенок -->
+    <color name="red_600">#fe3300</color>
+    <color name="red_800">#e22000</color>
+
 </resources>

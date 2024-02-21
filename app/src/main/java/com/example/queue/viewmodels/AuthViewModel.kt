@@ -1,4 +1,4 @@
-package com.example.queue
+package com.example.queue.viewmodels
 
 import androidx.lifecycle.ViewModel
 

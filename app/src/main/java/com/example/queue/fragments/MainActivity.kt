@@ -1,12 +1,7 @@
-package com.example.queue
+package com.example.queue.fragments
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
-import androidx.navigation.Navigation
-import androidx.navigation.findNavController
-import androidx.navigation.fragment.NavHostFragment
-import androidx.navigation.fragment.findNavController
 import com.example.queue.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {

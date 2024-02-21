@@ -4,7 +4,18 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".AuthFragment">
+    tools:context=".fragments.AuthFragment">
+
+    <ImageView
+        android:id="@+id/icon"
+        android:src="@drawable/main_icon"
+        android:layout_margin="@dimen/margin_large"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_width="240dp"
+        android:layout_height="240dp"
+        />
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/editTextEmail"
@@ -12,13 +23,14 @@
         android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/icon"
 
         app:endIconMode="clear_text"
         android:hint="Введите почту"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginBottom="16dp"
+        android:layout_marginStart="@dimen/margin_medium"
+        android:layout_marginEnd="@dimen/margin_medium"
+        android:layout_marginTop="@dimen/margin_medium"
+        android:layout_marginBottom="@dimen/margin_medium"
         app:boxBackgroundColor="@null"
         tools:ignore="MissingConstraints">
 
@@ -37,7 +49,87 @@
             app:errorEnabled="true"
             android:visibility="invisible"
             android:textColor="@color/red"/>
-
     </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/editTextPassword"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/editTextEmail"
+
+        app:endIconMode="password_toggle"
+        android:hint="Введите пароль"
+        android:layout_marginStart="@dimen/margin_medium"
+        android:layout_marginEnd="@dimen/margin_medium"
+        android:layout_marginTop="@dimen/margin_medium"
+        android:layout_marginBottom="@dimen/margin_medium"
+        app:boxBackgroundColor="@null"
+        tools:ignore="MissingConstraints">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/editTextPassword_inputText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@null"
+            android:inputType="textPassword"/>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/editTextPassword_errorText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:helperText="Error"
+            app:errorEnabled="true"
+            android:visibility="invisible"
+            android:textColor="@color/red"/>
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <TextView
+        android:id="@+id/forgot_password_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_medium"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/editTextPassword"
+        android:text="@string/forgotPassword" />
+
+
+    <Button
+        android:id="@+id/auth_button"
+        style="@style/Widget.Material3.Button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Войти"
+        android:backgroundTint="@color/blue_500"
+        android:textSize="@dimen/text_size_medium"
+        android:padding="@dimen/margin_small"
+        android:gravity="center"
+        android:layout_marginTop="@dimen/margin_small"
+        android:paddingEnd="@dimen/margin_large"
+        android:paddingStart="@dimen/margin_large"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/register_button"
+        />
+
+    <Button
+        android:id="@+id/register_button"
+        style="@style/Widget.Material3.Button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Зарегистрироваться"
+        android:backgroundTint="@color/blue_300"
+        android:textSize="@dimen/text_size_medium"
+        android:padding="@dimen/margin_small"
+        android:gravity="center"
+        android:layout_marginTop="@dimen/margin_large"
+        android:paddingEnd="@dimen/margin_large"
+        android:paddingStart="@dimen/margin_large"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/forgot_password_button"
+        />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
