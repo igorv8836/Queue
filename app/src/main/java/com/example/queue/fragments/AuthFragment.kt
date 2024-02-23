@@ -1,17 +1,19 @@
 package com.example.queue.fragments
 
-import androidx.lifecycle.ViewModelProvider
+import android.app.AlertDialog
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
 import android.widget.Toast
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
-import com.example.queue.viewmodels.AuthViewModel
 import com.example.queue.R
 import com.example.queue.databinding.FragmentAuthBinding
+import com.example.queue.viewmodels.AuthViewModel
 
 class AuthFragment : Fragment() {
     private lateinit var viewModel: AuthViewModel
@@ -30,6 +32,7 @@ class AuthFragment : Fragment() {
         super.onActivityCreated(savedInstanceState)
         viewModel = ViewModelProvider(this)[AuthViewModel::class.java]
         navController = findNavController()
+
 
         binding.registerButton.setOnClickListener{
             val bundle = Bundle()
@@ -52,8 +55,21 @@ class AuthFragment : Fragment() {
             navController.navigate(R.id.action_authFragment_to_newsFragment)
         }
 
-        viewModel.errorText.observe(viewLifecycleOwner){
-            Toast.makeText(requireContext(), viewModel.errorText.value, Toast.LENGTH_LONG).show()
+        viewModel.messageText.observe(viewLifecycleOwner){
+            Toast.makeText(requireContext(), viewModel.messageText.value, Toast.LENGTH_LONG).show()
+        }
+
+        binding.forgotPasswordButton.setOnClickListener {
+            val editText = EditText(requireContext())
+            editText.hint = "Введите почту"
+
+            val customViewDialog = AlertDialog.Builder(requireContext())
+                .setTitle("Восстановление пароля")
+                .setNegativeButton("Назад", null)
+                .setPositiveButton("Отправить"
+                ) { dialog, which -> viewModel.forgotPassword(editText.text.toString()) }
+                .setView(editText)
+                .show()
         }
     }
 

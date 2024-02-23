@@ -7,6 +7,10 @@ import com.google.firebase.auth.FirebaseAuth
 object FirebaseAccount {
     private val mAuth: FirebaseAuth = FirebaseAuth.getInstance()
 
+    fun checkAuth(): Boolean{
+        return mAuth.currentUser != null
+    }
+
     fun registerAccount(email: String, password: String, nickname: String, listener: TaskCompleteListener){
 
         if (email.isEmpty()){

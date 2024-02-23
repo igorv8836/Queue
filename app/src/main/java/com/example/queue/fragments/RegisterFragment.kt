@@ -44,6 +44,7 @@ class RegisterFragment : Fragment() {
 
         viewModel.errorText.observe(viewLifecycleOwner) {
             Snackbar.make(binding.root, viewModel.errorText.value.toString(), Snackbar.LENGTH_LONG).show()
+//            Toast.makeText(requireContext(), viewModel.errorText.value.toString(), Toast.LENGTH_LONG).show()
         }
     }
 
