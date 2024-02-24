@@ -6,7 +6,10 @@
     tools:context=".fragments.NewsFragment">
 
     <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/news_recycler_view"
         tools:listitem="@layout/news_item"
+        android:layout_marginStart="@dimen/margin_medium"
+        android:layout_marginEnd="@dimen/margin_medium"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 

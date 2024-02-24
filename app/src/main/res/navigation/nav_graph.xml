@@ -34,7 +34,32 @@
         android:id="@+id/newsFragment"
         android:name="com.example.queue.fragments.NewsFragment"
         android:label="fragment_news"
-        tools:layout="@layout/fragment_news" />
+        tools:layout="@layout/fragment_news" >
+        <action
+            android:id="@+id/action_newsFragment_to_searchFragment"
+            app:destination="@id/searchFragment" />
+        <action
+            android:id="@+id/action_newsFragment_to_queuesFragment"
+            app:destination="@id/queuesFragment" />
+        <action
+            android:id="@+id/action_newsFragment_to_settingsFragment"
+            app:destination="@id/settingsFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/searchFragment"
+        android:name="com.example.queue.fragments.SearchFragment"
+        android:label="fragment_search"
+        tools:layout="@layout/fragment_search" />
+    <fragment
+        android:id="@+id/queuesFragment"
+        android:name="com.example.queue.fragments.QueuesFragment"
+        android:label="fragment_queues"
+        tools:layout="@layout/fragment_queues" />
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="com.example.queue.fragments.SettingsFragment"
+        android:label="fragment_settings"
+        tools:layout="@layout/fragment_settings" />
 
 
 </navigation>

@@ -9,7 +9,7 @@
         android:icon="@drawable/icon_search"
         android:title="Поиск"/>
     <item
-        android:id="@+id/menu_events"
+        android:id="@+id/menu_queues"
         android:icon="@drawable/icon_events"
         android:title="Мои очереди"/>
     <item
