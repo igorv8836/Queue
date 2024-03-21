@@ -1,76 +1,73 @@
 package com.example.queue.firebase
 
-import android.util.Log
-import com.example.queue.listeners.TaskCompleteListener
 import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
 
 object FirebaseAccount {
     private val mAuth: FirebaseAuth = FirebaseAuth.getInstance()
 
-    fun checkAuth(): Boolean{
-        return mAuth.currentUser != null
-    }
+    suspend fun registerAccount(email: String, password: String, nickname: String): Result<Unit> =
+        withContext(Dispatchers.IO) {
+            if (email.isEmpty() || password.isEmpty() || nickname.isEmpty()) {
+                return@withContext Result.failure(IllegalArgumentException("Все поля должны быть заполнены"))
+            } else if (password.length < 6) {
+                return@withContext Result.failure(IllegalArgumentException("Пароль должен содержат не менее 6 символов"))
+            } else if (nickname.length < 3) {
+                return@withContext Result.failure(IllegalArgumentException("Никнейм должен содержать не менее 3 символов"))
+            }
 
-    fun registerAccount(email: String, password: String, nickname: String, listener: TaskCompleteListener){
-
-        if (email.isEmpty()){
-            listener.onErrorFinished("Почта не может быть пустой")
-            return
-        } else if (password.isEmpty()){
-            listener.onErrorFinished("Пароль не может быть пустым")
-            return
-        } else if (nickname.length < 2){
-            listener.onErrorFinished("Никнейм должен содержать как минимум 2 знака")
-            return
-        }
-
-        mAuth.createUserWithEmailAndPassword(email, nickname).addOnCompleteListener {
-            if (it.isSuccessful){
-                listener.onSuccessFinished()
-                Log.i("firebase", "аккаунт зарегистрирован")
-            } else {
-                if (it.exception is com.google.firebase.auth.FirebaseAuthWeakPasswordException){
-                    listener.onErrorFinished("В пароле должно быть не меньше 6 символов!")
-                    return@addOnCompleteListener
-                }
-                listener.onErrorFinished(it.exception.toString())
-                Log.i("firebase", it.exception.toString())
+            try {
+                mAuth.createUserWithEmailAndPassword(email, password).await()
+                Result.success(Unit)
+            } catch (e: Exception) {
+                Result.failure(e)
             }
         }
-    }
 
-    fun signInAccount(email: String, password: String, listener: TaskCompleteListener){
-        mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener{
-            if (it.isSuccessful){
-                listener.onSuccessFinished()
-            } else {
-                listener.onErrorFinished(it.exception.toString())
+    suspend fun signInAccount(email: String, password: String): Result<Unit> =
+        withContext(Dispatchers.IO) {
+            if (email.isEmpty() || password.isEmpty()) {
+                return@withContext Result.failure(IllegalArgumentException("Логин и пароль должны быть заполнены"))
             }
+
+            try {
+                mAuth.signInWithEmailAndPassword(email, password).await()
+                Result.success(Unit)
+            } catch (e: Exception) {
+                Result.failure(e)
+            }
+        }
+
+    suspend fun recoverPassword(email: String): Result<Unit> = withContext(Dispatchers.IO) {
+        if (email.isEmpty()) {
+            return@withContext Result.failure(IllegalArgumentException("Почта не может быть пустой"))
+        }
+        try {
+            mAuth.sendPasswordResetEmail(email).await()
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
         }
     }
 
-    fun recoverPassword(email: String, listener: TaskCompleteListener){
-        mAuth.sendPasswordResetEmail(email).addOnCompleteListener {
-            if (it.isSuccessful){
-                listener.onSuccessFinished()
-            } else {
-                listener.onErrorFinished(it.exception.toString())
-            }
+    suspend fun changePassword(password: String): Result<Unit> = withContext(Dispatchers.IO) {
+        if (password.isEmpty()) {
+            return@withContext Result.failure(IllegalArgumentException("Пароль не может быть пустым"))
+        }
+
+        try {
+            mAuth.currentUser?.updatePassword(password)?.await()
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
         }
     }
 
-    fun changePassword(password: String, listener: TaskCompleteListener){
-        mAuth.currentUser?.updatePassword(password)?.addOnCompleteListener {
-            if (it.isSuccessful){
-                listener.onSuccessFinished()
-            } else {
-                listener.onErrorFinished(it.exception.toString())
-            }
-        }
-    }
-
-    fun signOut(){
+    fun checkAuth() = mAuth.currentUser != null
+    fun signOut() {
         mAuth.signOut()
     }
-
 }
+

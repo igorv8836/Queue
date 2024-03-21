@@ -1,25 +1,28 @@
 package com.example.queue.viewmodels
 
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.queue.add_classes.NewsItem
-import com.example.queue.firebase.FirestoreDB
-import com.example.queue.listeners.NewsLoadedListener
+import com.example.queue.repositories.FirestoreRepository
+import kotlinx.coroutines.launch
 
 class NewsViewModel: ViewModel() {
-    val newsData = MutableLiveData<ArrayList<NewsItem>>()
-    val errorText = MutableLiveData<String>()
-    val firestoreDB: FirestoreDB = FirestoreDB
+    private val _newsData = MutableLiveData<List<NewsItem>>()
+    val newsData: LiveData<List<NewsItem>> = _newsData
+    private val _helpingText = MutableLiveData<String>()
+    val helpingText: LiveData<String> = _helpingText
+    val repository = FirestoreRepository
     fun loadNews() {
-        firestoreDB.getNewsData(object: NewsLoadedListener{
-            override fun newsLoaded(data: ArrayList<NewsItem>) {
-                newsData.value = data
+        viewModelScope.launch {
+            val res = repository.getNews()
+            if (res.isSuccess){
+                res.getOrNull()?.let { _newsData.postValue(it) }
+            } else {
+                _helpingText.postValue(res.exceptionOrNull()?.message)
             }
-
-            override fun newsNotLoaded(error: String) {
-                errorText.value = error
-            }
-        })
+        }
     }
 
 }

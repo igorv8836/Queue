@@ -1,15 +1,21 @@
 package com.example.queue.viewmodels
 
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.queue.firebase.FirebaseAccount
+import com.example.queue.repositories.AccountRepository
 
 class MainViewModel: ViewModel() {
-    private val firebaseAccount = FirebaseAccount
-    public val missAuth = MutableLiveData<Boolean>()
+    private val _navigateToBaseFragment: MutableLiveData<Boolean> = MutableLiveData()
+    val navigateToBaseFragment: LiveData<Boolean> = _navigateToBaseFragment
+    private val accountRepository = AccountRepository
 
-    fun checkAuth(){
-        if (firebaseAccount.checkAuth())
-            missAuth.value = true
+    init {
+        checkAuth()
+    }
+
+    private fun checkAuth(){
+        val res = accountRepository.checkAuth()
+        _navigateToBaseFragment.value = res
     }
 }

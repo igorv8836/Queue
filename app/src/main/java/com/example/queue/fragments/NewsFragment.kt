@@ -39,7 +39,7 @@ class NewsFragment : Fragment() {
         viewModel.loadNews()
 
         viewModel.newsData.observe(viewLifecycleOwner){
-            adapter = NewsAdapter(it)
+            adapter = NewsAdapter(ArrayList(it))
             binding.newsRecyclerView.layoutManager = LinearLayoutManager(requireContext())
             binding.newsRecyclerView.adapter = adapter
         }

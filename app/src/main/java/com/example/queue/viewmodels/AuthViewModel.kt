@@ -1,43 +1,50 @@
 package com.example.queue.viewmodels
 
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.queue.firebase.FirebaseAccount
-import com.example.queue.listeners.TaskCompleteListener
+import androidx.lifecycle.viewModelScope
+import com.example.queue.repositories.AccountRepository
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
+import kotlinx.coroutines.launch
 
 class AuthViewModel : ViewModel() {
-    public val navigateToBaseFragment: MutableLiveData<Boolean> = MutableLiveData()
-    public val messageText: MutableLiveData<String> = MutableLiveData()
-    private val firebaseAccount = FirebaseAccount
-    fun signIn(email: String, password: String){
-        firebaseAccount.signInAccount(email, password, object : TaskCompleteListener {
-            override fun onSuccessFinished() {
-                navigateToBaseFragment.value = true
-            }
+    private val _navigateToBaseFragment: MutableLiveData<Boolean> = MutableLiveData()
+    val navigateToBaseFragment: LiveData<Boolean> = _navigateToBaseFragment
+    private val _helpingText = MutableLiveData<String>()
+    val helpingText: LiveData<String> = _helpingText
+    private val accountRepository = AccountRepository
 
-            override fun onErrorFinished(error: String) {
-                messageText.value = error
-            }
-        })
+
+    init {
+//        accountRepository.signOut()
     }
 
-    fun forgotPassword(email: String){
-        firebaseAccount.recoverPassword(email, object : TaskCompleteListener{
-            override fun onSuccessFinished() {
-                messageText.value = "Проверьте почту"
-            }
 
-            override fun onErrorFinished(error: String) {
-                messageText.value = error
+    fun signIn(email: String, password: String) {
+        viewModelScope.launch {
+            val res = accountRepository.signInAccount(email, password)
+            if (res.isSuccess) {
+                _navigateToBaseFragment.postValue(true)
+            } else {
+                val err = when (res.exceptionOrNull()) {
+                    is FirebaseAuthInvalidCredentialsException -> "Неверный логин или пароль"
+                    else -> "Неизвестная ошибка"
+                }
+                _helpingText.postValue(err)
             }
-
-        })
+        }
     }
 
-//    fun checkAuth(){
-//        if (firebaseAccount.checkAuth()){
-//            missAuth.value = true
-//        }
-//    }
-
+    fun forgotPassword(email: String) {
+        viewModelScope.launch {
+            val res = accountRepository.recoverPassword(email)
+            val message = if (res.isSuccess) {
+                "На почту отправлено письмо для восстановления"
+            } else {
+                "Критическая ошибка " + res.exceptionOrNull()?.message
+            }
+            _helpingText.postValue(message)
+        }
+    }
 }

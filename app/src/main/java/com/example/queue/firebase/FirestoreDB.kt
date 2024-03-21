@@ -1,31 +1,32 @@
 package com.example.queue.firebase
 
+import android.annotation.SuppressLint
 import com.example.queue.add_classes.NewsItem
-import com.example.queue.listeners.NewsLoadedListener
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
 
-object FirestoreDB{
+object FirestoreDB {
+    @SuppressLint("StaticFieldLeak")
     private val firebaseFirestore = FirebaseFirestore.getInstance()
 
-    fun getNewsData(listener: NewsLoadedListener){
-        firebaseFirestore.collection("news")
-            .orderBy("date", Query.Direction.DESCENDING)
-            .get()
-            .addOnCompleteListener {
-                val data: ArrayList<NewsItem> = ArrayList()
-                if (it.isSuccessful){
-                    val docs = it.result.documents
-                    for (i in docs){
-                        data.add(NewsItem(
-                            i.get("title").toString(),
-                            i.get("text").toString(),
-                            (i.get("date") as com.google.firebase.Timestamp).toDate()))
-                    }
-                    listener.newsLoaded(data)
-                } else {
-                    listener.newsNotLoaded("Возникла ошибка")
-                }
+    suspend fun getNewsData(): Result<List<NewsItem>> = withContext(Dispatchers.IO){
+        try {
+            val snapshot = firebaseFirestore.collection("news")
+                .orderBy("date", Query.Direction.DESCENDING).get().await()
+
+            val data = snapshot.documents.map { doc ->
+                NewsItem(
+                    doc.getString("title") ?: error("Пустое название"),
+                    doc.getString("text") ?: error("Пустое описание"),
+                    doc.getTimestamp("date")?.toDate() ?: error("Пустая дата")
+                )
             }
+            return@withContext Result.success(data)
+        } catch (e: Exception) {
+            return@withContext Result.failure(e)
+        }
     }
 }

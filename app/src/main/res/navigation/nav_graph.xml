@@ -5,6 +5,19 @@
     android:id="@+id/nav_graph"
     app:startDestination="@id/authFragment">
 
+    <action
+        android:id="@+id/action_to_searchFragment"
+        app:destination="@id/searchFragment" />
+    <action
+        android:id="@+id/action_to_queuesFragment"
+        app:destination="@id/queuesFragment" />
+    <action
+        android:id="@+id/action_to_settingsFragment"
+        app:destination="@id/settingsFragment" />
+    <action
+        android:id="@+id/action_to_newsFragment"
+        app:destination="@id/newsFragment" />
+
     <fragment
         android:id="@+id/authFragment"
         android:name="com.example.queue.fragments.AuthFragment"
@@ -30,20 +43,13 @@
             app:enterAnim="@animator/nav_default_enter_anim"
             app:destination="@id/newsFragment" />
     </fragment>
+
+
     <fragment
         android:id="@+id/newsFragment"
         android:name="com.example.queue.fragments.NewsFragment"
         android:label="fragment_news"
         tools:layout="@layout/fragment_news" >
-        <action
-            android:id="@+id/action_newsFragment_to_searchFragment"
-            app:destination="@id/searchFragment" />
-        <action
-            android:id="@+id/action_newsFragment_to_queuesFragment"
-            app:destination="@id/queuesFragment" />
-        <action
-            android:id="@+id/action_newsFragment_to_settingsFragment"
-            app:destination="@id/settingsFragment" />
     </fragment>
     <fragment
         android:id="@+id/searchFragment"

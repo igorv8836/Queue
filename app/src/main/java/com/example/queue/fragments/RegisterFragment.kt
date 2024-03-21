@@ -1,5 +1,6 @@
 package com.example.queue.fragments
 
+import android.app.Activity
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -11,17 +12,17 @@ import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import com.example.queue.R
 import com.example.queue.databinding.FragmentRegisterBinding
+import com.example.queue.listeners.ShowBottomMenuListener
 import com.example.queue.viewmodels.RegisterViewModel
 import com.google.android.material.snackbar.Snackbar
 
 class RegisterFragment : Fragment() {
+    private var showBottomMenuListener: ShowBottomMenuListener? = null
     private lateinit var viewModel: RegisterViewModel
     private lateinit var navController: NavController
     private lateinit var binding: FragmentRegisterBinding
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
 
+    @Deprecated("Deprecated in Java")
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         viewModel = ViewModelProvider(this)[RegisterViewModel::class.java]
@@ -38,13 +39,14 @@ class RegisterFragment : Fragment() {
         }
 
         viewModel.navigateToBaseFragment.observe(viewLifecycleOwner) {
-            if (it)
+            if (it) {
                 navController.navigate(R.id.action_registerFragment_to_newsFragment)
+                showBottomMenuListener?.onShow()
+            }
         }
 
         viewModel.errorText.observe(viewLifecycleOwner) {
-            Snackbar.make(binding.root, viewModel.errorText.value.toString(), Snackbar.LENGTH_LONG).show()
-//            Toast.makeText(requireContext(), viewModel.errorText.value.toString(), Toast.LENGTH_LONG).show()
+            Toast.makeText(requireContext(), viewModel.errorText.value.toString(), Toast.LENGTH_LONG).show()
         }
     }
 
@@ -54,5 +56,12 @@ class RegisterFragment : Fragment() {
     ): View? {
         binding = FragmentRegisterBinding.inflate(layoutInflater, container, false)
         return binding.root
+    }
+
+    @Deprecated("Deprecated in Java")
+    override fun onAttach(activity: Activity) {
+        super.onAttach(activity)
+        if (activity is ShowBottomMenuListener)
+            showBottomMenuListener = activity
     }
 }
