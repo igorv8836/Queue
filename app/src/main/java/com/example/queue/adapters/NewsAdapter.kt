@@ -8,12 +8,15 @@ import com.example.queue.add_classes.NewsItem
 import com.example.queue.databinding.NewsItemBinding
 import java.text.SimpleDateFormat
 import java.util.Locale
+import kotlin.math.min
 
 class NewsAdapter(private var data: ArrayList<NewsItem>):
     RecyclerView.Adapter<NewsAdapter.NewsViewHolder>() {
 
     class NewsViewHolder(view: View): RecyclerView.ViewHolder(view){
         private val binding: NewsItemBinding = NewsItemBinding.bind(view)
+        var detailedShow = false
+        val main = binding.main
         val title = binding.title
         val text = binding.description
         val date = binding.date
@@ -34,8 +37,17 @@ class NewsAdapter(private var data: ArrayList<NewsItem>):
 
     override fun onBindViewHolder(holder: NewsViewHolder, position: Int) {
         holder.title.text = data[position].title
-        holder.text.text = data[position].text
+        holder.text.text = data[position].text.substring(0, min(data[position].text.length, 100))
         holder.date.text = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
             .format(data[position].date)
+
+        holder.main.setOnClickListener {
+            holder.detailedShow = !holder.detailedShow
+            if (holder.detailedShow){
+                holder.text.text = data[position].text
+            } else {
+                holder.text.text = data[position].text.substring(0, min(data[position].text.length, 100))
+            }
+        }
     }
 }
