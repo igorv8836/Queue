@@ -5,6 +5,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -37,6 +38,10 @@ class NewsFragment : Fragment() {
         viewModel = ViewModelProvider(this)[NewsViewModel::class.java]
 
         viewModel.loadNews()
+
+        viewModel.helpingText.observe(viewLifecycleOwner){
+            Toast.makeText(requireContext(), it, Toast.LENGTH_SHORT).show()
+        }
 
         viewModel.newsData.observe(viewLifecycleOwner){
             adapter = NewsAdapter(ArrayList(it))

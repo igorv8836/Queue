@@ -1,5 +1,6 @@
 package com.example.queue.adapters
 
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -35,9 +36,13 @@ class NewsAdapter(private var data: ArrayList<NewsItem>):
         return data.size
     }
 
+    @SuppressLint("SetTextI18n")
     override fun onBindViewHolder(holder: NewsViewHolder, position: Int) {
         holder.title.text = data[position].title
-        holder.text.text = data[position].text.substring(0, min(data[position].text.length, 100))
+        if (data[position].text.length > 100)
+            holder.text.text = data[position].text.substring(0, 100) + "..."
+        else
+            holder.text.text = data[position].text
         holder.date.text = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
             .format(data[position].date)
 
@@ -46,7 +51,10 @@ class NewsAdapter(private var data: ArrayList<NewsItem>):
             if (holder.detailedShow){
                 holder.text.text = data[position].text
             } else {
-                holder.text.text = data[position].text.substring(0, min(data[position].text.length, 100))
+                if (data[position].text.length > 100)
+                    holder.text.text = data[position].text.substring(0, 100) + "..."
+                else
+                    holder.text.text = data[position].text
             }
         }
     }

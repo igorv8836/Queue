@@ -13,7 +13,7 @@ class NewsViewModel: ViewModel() {
     val newsData: LiveData<List<NewsItem>> = _newsData
     private val _helpingText = MutableLiveData<String>()
     val helpingText: LiveData<String> = _helpingText
-    val repository = FirestoreRepository
+    private val repository = FirestoreRepository
     fun loadNews() {
         viewModelScope.launch {
             val res = repository.getNews()

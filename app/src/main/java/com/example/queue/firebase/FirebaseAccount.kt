@@ -65,6 +65,8 @@ object FirebaseAccount {
         }
     }
 
+    fun getEmail() = mAuth.currentUser?.email
+
     fun checkAuth() = mAuth.currentUser != null
     fun signOut() {
         mAuth.signOut()

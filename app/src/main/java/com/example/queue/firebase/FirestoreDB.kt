@@ -1,16 +1,27 @@
 package com.example.queue.firebase
 
 import android.annotation.SuppressLint
+import android.net.Uri
+import android.provider.OpenableColumns
+import com.example.queue.App
 import com.example.queue.add_classes.NewsItem
+import com.google.firebase.Firebase
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
+import com.google.firebase.storage.StorageReference
+import com.google.firebase.storage.storage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
+import java.io.File
+import java.lang.NullPointerException
+import java.util.UUID
 
 object FirestoreDB {
     @SuppressLint("StaticFieldLeak")
     private val firebaseFirestore = FirebaseFirestore.getInstance()
+    private val currUser = FirebaseAuth.getInstance().currentUser
 
     suspend fun getNewsData(): Result<List<NewsItem>> = withContext(Dispatchers.IO){
         try {
@@ -25,6 +36,64 @@ object FirestoreDB {
                 )
             }
             return@withContext Result.success(data)
+        } catch (e: Exception) {
+            return@withContext Result.failure(e)
+        }
+    }
+
+    suspend fun setNickname(nickname: String): Result<Unit> = withContext(Dispatchers.IO){
+        try {
+            if (currUser == null)
+                return@withContext Result.failure(NullPointerException())
+            val user = hashMapOf("nickname" to nickname)
+            val a = firebaseFirestore.collection("users")
+                .document(currUser.uid).set(user).await()
+            return@withContext Result.success(Unit)
+        } catch (e: Exception){
+            return@withContext Result.failure(e)
+        }
+    }
+
+    suspend fun getNickname(): Result<String> = withContext(Dispatchers.IO){
+        try {
+            if (currUser == null)
+                return@withContext Result.failure(NullPointerException())
+            val res = firebaseFirestore.collection("users").document(currUser.uid).get().await()
+            return@withContext Result.success(res.get("nickname").toString())
+        } catch (e: Exception){
+            return@withContext Result.failure(e)
+        }
+    }
+
+    suspend fun uploadImage(imageUri: Uri): Result<Uri> = withContext(Dispatchers.IO) {
+        try {
+            val cursor = App.instance.contentResolver.query(imageUri, null, null, null, null)
+            val size = cursor?.use {
+                val sizeIndex = it.getColumnIndex(OpenableColumns.SIZE)
+                it.moveToFirst()
+                it.getLong(sizeIndex)
+            }
+            if ((size ?: 0) > 1_048_576)
+                return@withContext Result.failure(Exception("Файл не может весить более 1 мб"))
+            val storageRef = Firebase.storage.reference
+            val imageName = UUID.randomUUID().toString()
+            val imageRef = storageRef.child("user_images/$imageName")
+            imageRef.putFile(imageUri).await()
+            val imageUrl = imageRef.downloadUrl.await()
+            return@withContext Result.success(imageUrl)
+        } catch (e: Exception) {
+            return@withContext Result.failure(e)
+        }
+    }
+
+    suspend fun downloadImage(fileRef: StorageReference): Result<File> = withContext(Dispatchers.IO) {
+        try {
+            val byteArray = fileRef.getBytes(1_048_576).await()
+            val tempFile = createTempFile("temp", null, App.instance.cacheDir)
+            tempFile.outputStream().use { outputStream ->
+                outputStream.write(byteArray)
+            }
+            return@withContext Result.success(tempFile)
         } catch (e: Exception) {
             return@withContext Result.failure(e)
         }
