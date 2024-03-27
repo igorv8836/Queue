@@ -65,7 +65,7 @@ object FirestoreDB {
         }
     }
 
-    suspend fun uploadImage(imageUri: Uri): Result<Uri> = withContext(Dispatchers.IO) {
+    suspend fun uploadImage(imageUri: Uri): Result<StorageReference> = withContext(Dispatchers.IO) {
         try {
             val cursor = App.instance.contentResolver.query(imageUri, null, null, null, null)
             val size = cursor?.use {
@@ -79,8 +79,7 @@ object FirestoreDB {
             val imageName = UUID.randomUUID().toString()
             val imageRef = storageRef.child("user_images/$imageName")
             imageRef.putFile(imageUri).await()
-            val imageUrl = imageRef.downloadUrl.await()
-            return@withContext Result.success(imageUrl)
+            return@withContext Result.success(imageRef)
         } catch (e: Exception) {
             return@withContext Result.failure(e)
         }
@@ -95,6 +94,16 @@ object FirestoreDB {
             }
             return@withContext Result.success(tempFile)
         } catch (e: Exception) {
+            return@withContext Result.failure(e)
+        }
+    }
+
+    suspend fun savePhotoPath(fileRef: StorageReference): Result<Unit> = withContext(Dispatchers.IO){
+        try {
+            val user = hashMapOf("photoPath" to fileRef.path)
+            firebaseFirestore.collection("users").document(currUser!!.uid).set(user).await()
+            return@withContext Result.success(Unit)
+        } catch (e: Exception){
             return@withContext Result.failure(e)
         }
     }

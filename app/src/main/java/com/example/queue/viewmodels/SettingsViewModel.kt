@@ -1,11 +1,13 @@
 package com.example.queue.viewmodels
 
+import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.queue.repositories.AccountRepository
 import com.example.queue.repositories.FirestoreRepository
+import com.google.firebase.storage.StorageReference
 import kotlinx.coroutines.launch
 import java.io.File
 
@@ -22,11 +24,13 @@ class SettingsViewModel: ViewModel() {
     val image: LiveData<File> = _image
     private val _showAuth = MutableLiveData<Boolean>()
     val showAuth: LiveData<Boolean> = _showAuth
+    private val _photoFile = MutableLiveData<File>()
+    val photoFile: LiveData<File> = _photoFile
 
     init {
         getEmail()
         getNickname()
-        getPhoto()
+//        getPhoto()
     }
 
     private fun getEmail(){
@@ -45,14 +49,33 @@ class SettingsViewModel: ViewModel() {
         }
     }
 
-    private fun getPhoto(){
+    private fun getPhoto(ref: StorageReference){
         viewModelScope.launch {
-
+            val res = firestoreRep.getUserImage(ref)
+            if (res.isSuccess){
+                if (res.getOrNull() != null)
+                    _photoFile.postValue(res.getOrNull())
+                else
+                    _helpingText.postValue("Фотка не загружена")
+            } else{
+                _helpingText.postValue(res.exceptionOrNull()?.message)
+            }
         }
     }
 
     fun signOut(){
         accRep.signOut()
         _showAuth.value = true
+    }
+
+    fun changePhoto(photoUri: Uri){
+        viewModelScope.launch {
+            val res = firestoreRep.setPhoto(photoUri)
+            if (res.isSuccess){
+                res.getOrNull()?.let { getPhoto(it) }
+            } else {
+                _helpingText.postValue(res.exceptionOrNull()?.message)
+            }
+        }
     }
 }
