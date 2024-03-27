@@ -3,9 +3,6 @@ package com.example.queue.fragments
 import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
-import android.graphics.ImageDecoder
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
@@ -13,16 +10,21 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
+import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import com.example.queue.R
+import com.example.queue.databinding.EditTextBinding
 import com.example.queue.databinding.FragmentSettingsBinding
 import com.example.queue.viewmodels.SettingsViewModel
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.textfield.TextInputEditText
+import com.google.android.material.textfield.TextInputLayout
 import com.squareup.picasso.Picasso
-import java.io.FileOutputStream
 
 class SettingsFragment : Fragment() {
     private val READ_MEDIA_IMAGES_PERMISSION = 1
@@ -48,29 +50,48 @@ class SettingsFragment : Fragment() {
             helpingText.observe(viewLifecycleOwner){
                 Toast.makeText(requireContext(), it, Toast.LENGTH_SHORT).show()
             }
-
-            email.observe(viewLifecycleOwner){
-                binding.emailTextview.text = it
-            }
-
-            nickname.observe(viewLifecycleOwner){
-                binding.nicknameTextview.text = it
-            }
-
+            email.observe(viewLifecycleOwner){ binding.emailTextview.text = it }
+            nickname.observe(viewLifecycleOwner){ binding.nicknameTextview.text = it }
             showAuth.observe(viewLifecycleOwner){
                 if (it)
                     navController.navigate(R.id.authFragment)
             }
+            photoFile.observe(viewLifecycleOwner){
+                Picasso.get().load(it).resize(
+                    resources.getDimensionPixelSize(R.dimen.user_image_size),
+                    resources.getDimensionPixelSize(R.dimen.user_image_size)
+                ).centerCrop().into(binding.accountImage)
+            }
         }
 
-        binding.signOutButton.setOnClickListener { viewModel.signOut() }
+        val dialogBinding = EditTextBinding.bind(
+            layoutInflater.inflate(R.layout.edit_text, null))
 
-        binding.accountImage.setOnClickListener {
-            changePhoto()
-        }
+        with(binding){
+            signOutButton.setOnClickListener { viewModel.signOut() }
+            accountImage.setOnClickListener { changePhoto() }
+            changeNicknameButton.setOnClickListener{
+                MaterialAlertDialogBuilder(requireContext())
+                    .setTitle("Изменение никнейма")
+                    .setView(dialogBinding.root)
+                    .setNegativeButton("Отмена") { _, _ -> }
+                    .setPositiveButton("Сохранить") { _, _ ->
+                        viewModel.changeNickname(dialogBinding.inputEditText.text.toString())
+                    }
+                    .show()
+            }
+            changePasswordButton.setOnClickListener {
+                dialogBinding.textField.hint = "Введите новый пароль"
 
-        viewModel.photoFile.observe(viewLifecycleOwner){
-            Picasso.get().load(it).into(binding.accountImage)
+                MaterialAlertDialogBuilder(requireContext())
+                    .setTitle("Изменение никнейма")
+                    .setView(dialogBinding.root)
+                    .setNegativeButton("Отмена") { _, _ -> }
+                    .setPositiveButton("Изменить") { _, _ ->
+                        viewModel.changePassword(dialogBinding.inputEditText.text.toString())
+                    }
+                    .show()
+            }
         }
     }
 

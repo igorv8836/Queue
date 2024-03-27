@@ -29,7 +29,7 @@ class AuthViewModel : ViewModel() {
             } else {
                 val err = when (res.exceptionOrNull()) {
                     is FirebaseAuthInvalidCredentialsException -> "Неверный логин или пароль"
-                    else -> "Неизвестная ошибка"
+                    else -> res.exceptionOrNull()?.message ?: "Неизвестная ошибка"
                 }
                 _helpingText.postValue(err)
             }

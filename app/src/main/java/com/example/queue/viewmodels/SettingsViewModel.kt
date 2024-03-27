@@ -30,7 +30,7 @@ class SettingsViewModel: ViewModel() {
     init {
         getEmail()
         getNickname()
-//        getPhoto()
+        getPhoto()
     }
 
     private fun getEmail(){
@@ -49,12 +49,13 @@ class SettingsViewModel: ViewModel() {
         }
     }
 
-    private fun getPhoto(ref: StorageReference){
+    private fun getPhoto(){
         viewModelScope.launch {
-            val res = firestoreRep.getUserImage(ref)
+            val res = firestoreRep.getUserImage()
             if (res.isSuccess){
-                if (res.getOrNull() != null)
-                    _photoFile.postValue(res.getOrNull())
+                val file = res.getOrNull()
+                if (file != null)
+                    _photoFile.postValue(file)
                 else
                     _helpingText.postValue("Фотка не загружена")
             } else{
@@ -72,8 +73,25 @@ class SettingsViewModel: ViewModel() {
         viewModelScope.launch {
             val res = firestoreRep.setPhoto(photoUri)
             if (res.isSuccess){
-                res.getOrNull()?.let { getPhoto(it) }
+                getPhoto()
             } else {
+                _helpingText.postValue(res.exceptionOrNull()?.message)
+            }
+        }
+    }
+
+    fun changeNickname(nickname: String){
+        viewModelScope.launch {
+            val res = firestoreRep.changeNickname(nickname)
+            if (res.isFailure)
+                _helpingText.postValue(res.exceptionOrNull()?.message)
+        }
+    }
+
+    fun changePassword(password: String){
+        viewModelScope.launch {
+            val res = accRep.changePassword(password)
+            if (res.isFailure){
                 _helpingText.postValue(res.exceptionOrNull()?.message)
             }
         }

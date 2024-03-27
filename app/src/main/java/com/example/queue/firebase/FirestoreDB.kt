@@ -15,12 +15,14 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import java.io.File
+import java.lang.IllegalArgumentException
 import java.lang.NullPointerException
 import java.util.UUID
 
 object FirestoreDB {
     @SuppressLint("StaticFieldLeak")
     private val firebaseFirestore = FirebaseFirestore.getInstance()
+    private val storageRef = Firebase.storage.reference
     private val currUser = FirebaseAuth.getInstance().currentUser
 
     suspend fun getNewsData(): Result<List<NewsItem>> = withContext(Dispatchers.IO){
@@ -43,11 +45,13 @@ object FirestoreDB {
 
     suspend fun setNickname(nickname: String): Result<Unit> = withContext(Dispatchers.IO){
         try {
+            if (nickname.length <= 3)
+                return@withContext Result.failure(IllegalArgumentException("Длина должна быть больше 3 символов"))
             if (currUser == null)
                 return@withContext Result.failure(NullPointerException())
             val user = hashMapOf("nickname" to nickname)
             val a = firebaseFirestore.collection("users")
-                .document(currUser.uid).set(user).await()
+                .document(currUser.uid).update(user as Map<String, Any>).await()
             return@withContext Result.success(Unit)
         } catch (e: Exception){
             return@withContext Result.failure(e)
@@ -75,7 +79,6 @@ object FirestoreDB {
             }
             if ((size ?: 0) > 1_048_576)
                 return@withContext Result.failure(Exception("Файл не может весить более 1 мб"))
-            val storageRef = Firebase.storage.reference
             val imageName = UUID.randomUUID().toString()
             val imageRef = storageRef.child("user_images/$imageName")
             imageRef.putFile(imageUri).await()
@@ -103,6 +106,17 @@ object FirestoreDB {
             val user = hashMapOf("photoPath" to fileRef.path)
             firebaseFirestore.collection("users").document(currUser!!.uid).set(user).await()
             return@withContext Result.success(Unit)
+        } catch (e: Exception){
+            return@withContext Result.failure(e)
+        }
+    }
+
+    suspend fun getUserImagePath(): Result<StorageReference> = withContext(Dispatchers.IO){
+        try {
+            if (currUser == null)
+                return@withContext Result.failure(NullPointerException())
+            val res = firebaseFirestore.collection("users").document(currUser.uid).get().await()
+            return@withContext Result.success(storageRef.child(res.get("photoPath").toString()))
         } catch (e: Exception){
             return@withContext Result.failure(e)
         }

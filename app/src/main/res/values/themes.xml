@@ -14,7 +14,7 @@
         <!-- Customize your theme here. -->
     </style>
 
-    <style name="Theme.Queue" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+    <style name="Theme.Queue" parent="Theme.Material3.DayNight.NoActionBar">
 
         <item name="colorPrimary">@color/blue_300</item>
         <item name="colorPrimaryVariant">@color/blue_500</item>

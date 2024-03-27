@@ -14,8 +14,7 @@
         android:layout_height="160dp"
         android:src="@drawable/no_photo"
         android:layout_gravity="center"
-        app:shapeAppearanceOverlay="@style/ImageView.Round"
-        android:background="@drawable/circular_background" />
+        app:shapeAppearanceOverlay="@style/ImageView.Round" />
 
     <TextView
         android:id="@+id/nickname_textview"
