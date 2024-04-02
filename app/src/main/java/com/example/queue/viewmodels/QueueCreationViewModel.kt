@@ -13,11 +13,12 @@ import kotlinx.coroutines.launch
 
 class QueueCreationViewModel: ViewModel() {
     private val repository = QueueRepository
+    val creationComplete = MutableStateFlow(false)
+    private val _showLoading = MutableStateFlow(false)
+    val showLoading: StateFlow<Boolean> = _showLoading
     private var _isQueueClosed = MutableStateFlow(false)
     private var _isQueueSingleEvent = MutableStateFlow(false)
 
-    private var _helpingMessage = MutableStateFlow("")
-    val helpingMessage: StateFlow<String> = _helpingMessage
     fun changeQueueClosed(isClosed: Boolean) {
         _isQueueClosed.value = isClosed
     }
@@ -27,11 +28,16 @@ class QueueCreationViewModel: ViewModel() {
     }
 
     fun createQueue(title: String, description: String) {
+        _showLoading.value = true
         viewModelScope.launch {
             val res = repository.createQueue(title, description, _isQueueClosed.value, _isQueueSingleEvent.value)
-            if (res.isFailure)
-                _helpingMessage.value = "Ошибка " + res.exceptionOrNull()?.message
-
+            if (res.isSuccess) {
+                _showLoading.value = false
+                creationComplete.value = true
+            } else {
+                _showLoading.value = false
+                creationComplete.value = true
+            }
         }
     }
 }

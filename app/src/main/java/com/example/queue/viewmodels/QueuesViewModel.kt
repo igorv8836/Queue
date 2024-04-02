@@ -2,6 +2,7 @@ package com.example.queue.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.queue.add_classes.Queue
 import com.example.queue.repositories.QueueRepository
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -12,18 +13,14 @@ import kotlinx.coroutines.launch
 
 open class QueuesViewModel: ViewModel() {
     private val repository = QueueRepository
-    private val _queues = MutableStateFlow<List<QueueItem>>(emptyList())
+    private val _queues = MutableStateFlow<List<Queue>>(emptyList())
     open val queues = _queues.asStateFlow()
     private val _errorText = MutableSharedFlow<String>()
     val errorText: SharedFlow<String> = _errorText
 
     init {
         getErrorFlow()
-        val initialQueues = listOf(
-            QueueItem("Queue 1", "Description 1", 3),
-            QueueItem("Queue 2", "Description 2", 5)
-        )
-        _queues.value = initialQueues
+        getQueuesData()
     }
 
     private fun getErrorFlow(){
@@ -31,6 +28,14 @@ open class QueuesViewModel: ViewModel() {
             repository.getErrorFlow().collect{
                 it.message?.let { it1 -> _errorText.emit(it1) }
             }
+        }
+    }
+
+    private fun getQueuesData(){
+        viewModelScope.launch {
+            val queuesData = repository.getQueues()
+            if (queuesData.isSuccess)
+                _queues.value = queuesData.getOrNull() ?: emptyList()
         }
     }
 

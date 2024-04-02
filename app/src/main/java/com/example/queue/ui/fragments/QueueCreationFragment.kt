@@ -30,6 +30,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -43,16 +44,27 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import com.example.queue.R
+import com.example.queue.ui.components.TopLoadingBar
 import com.example.queue.viewmodels.QueueCreationViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 
 class CreationQueueFragment : BottomSheetDialogFragment() {
     private val viewModel: QueueCreationViewModel by viewModels()
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.creationComplete.collect{
+                if(it){
+                    dismiss()
+                }
+            }
+        }
     }
 
     override fun onCreateView(
@@ -74,6 +86,7 @@ class CreationQueueFragment : BottomSheetDialogFragment() {
 fun QueueCreationScreen(viewModel: QueueCreationViewModel, onExitClicked: () -> Unit) {
     var queueName by rememberSaveable { mutableStateOf("") }
     var description by rememberSaveable { mutableStateOf("") }
+    val isLoading = viewModel.showLoading.collectAsState()
     Scaffold(topBar = {
         TopAppBar(
             title = { Text(text = "Создание очереди", style = MaterialTheme.typography.titleLarge) },
@@ -88,7 +101,6 @@ fun QueueCreationScreen(viewModel: QueueCreationViewModel, onExitClicked: () -> 
             actions = {
                 IconButton(onClick = {
                     viewModel.createQueue(queueName, description)
-                    onExitClicked()
                 }) {
                     Icon(painter = painterResource(id = R.drawable.check), contentDescription = "Save")
                 }
@@ -100,6 +112,7 @@ fun QueueCreationScreen(viewModel: QueueCreationViewModel, onExitClicked: () -> 
                 .padding(paddingValues)
                 .fillMaxWidth()
         ) {
+            TopLoadingBar(isLoading = isLoading.value)
             MyTextField(hint = "Название очереди", dataText = queueName){ queueName = it }
             MyTextField(hint = "Описание", dataText = description, lines = 5){ description = it }
 

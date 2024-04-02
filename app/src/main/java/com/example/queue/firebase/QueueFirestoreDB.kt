@@ -1,13 +1,14 @@
 package com.example.queue.firebase
 
 import android.annotation.SuppressLint
+import com.example.queue.add_classes.Member
+import com.example.queue.add_classes.Queue
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.storage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
@@ -19,6 +20,8 @@ object QueueFirestoreDB {
     private val currUser = FirebaseAuth.getInstance().currentUser
     private val _errorFlow = MutableSharedFlow<Exception>()
     val errorFlow: SharedFlow<Exception> = _errorFlow
+
+    suspend fun emitError(Exception: Exception){ _errorFlow.emit(Exception) }
     suspend fun createQueue(
         name: String,
         description: String,
@@ -26,23 +29,70 @@ object QueueFirestoreDB {
         isPeriodic: Boolean
     ) = withContext(Dispatchers.IO){
         try {
-            if (name.length < 3 || description.length < 3) {
-                val e = Exception("Имя или описание слишком короткие, нужно больше 3 символов")
-                _errorFlow.emit(e)
-                return@withContext Result.failure(e)
-            }
+            if (name.length < 3 || description.length < 3)
+                throw Exception("Имя или описание слишком короткие, нужно больше 3 символов")
 
-            firebaseFirestore.collection("queues")
+            val queue = firebaseFirestore.collection("queues")
                 .add(mapOf(
                     "name" to name,
                     "description" to description,
                     "isOpened" to isOpened,
                     "isPeriodic" to isPeriodic,
-                    "owner" to currUser?.uid
+                    "owner" to currUser?.uid,
+                    "members" to listOf(currUser?.uid)
+                )).await()
+            val res = addMember(queue.id, currUser?.uid ?: "", true, 0)
+            if (res.isFailure) throw res.exceptionOrNull() ?: Exception("Неизвестная ошибка")
+            return@withContext Result.success(Unit)
+        } catch (e: Exception){
+            emitError(e)
+            return@withContext Result.failure(e)
+        }
+    }
+
+    suspend fun addMember(queueId: String, userId: String, isAdmin: Boolean, position: Int) = withContext(Dispatchers.IO){
+        try {
+            firebaseFirestore.collection("queues").document(queueId)
+                .collection("members").document(userId)
+                .set(mapOf(
+                    "isAdmin" to isAdmin,
+                    "position" to position
                 )).await()
             return@withContext Result.success(Unit)
         } catch (e: Exception){
-            _errorFlow.emit(e)
+            emitError(e)
+            return@withContext Result.failure(e)
+        }
+    }
+
+    suspend fun getQueues() = withContext(Dispatchers.IO){
+        try {
+            val queues = firebaseFirestore.collection("queues")
+                .whereArrayContains("members", currUser?.uid ?: "").get().await()
+                .documents.map {queue ->
+                    val members = queue.reference.collection("members").get().await().documents.map { member ->
+                        val userData = firebaseFirestore.collection("users").document(member.id).get().await()
+                        Member(
+                            member.id,
+                            userData["nickname"] as String,
+                            member["isAdmin"] as Boolean,
+                            userData["photoPath"] as String,
+                            (member["position"] as Long).toInt()
+                        )
+                    }
+                    Queue(
+                        queue.id,
+                        queue["name"] as String,
+                        queue["description"] as String,
+                        members,
+                        queue["isOpened"] as Boolean,
+                        queue["isPeriodic"] as Boolean,
+                        members.first { it.id == queue["owner"] }
+                    )
+                }
+            return@withContext Result.success(queues)
+        } catch (e: Exception){
+            emitError(e)
             return@withContext Result.failure(e)
         }
     }

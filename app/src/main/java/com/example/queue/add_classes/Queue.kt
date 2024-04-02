@@ -4,8 +4,8 @@ data class Queue(
     val id: String? = null,
     val name: String,
     val description: String,
-    val members: List<String>,
+    val members: List<Member>,
     val isOpen: Boolean,
     val isStarted: Boolean,
-    val owner: String
+    val owner: Member
 )

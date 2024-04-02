@@ -20,10 +20,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.queue.R
+import com.example.queue.add_classes.Queue
 import com.example.queue.viewmodels.QueueItem
 
 @Composable
-fun QueueItemCard(queue: QueueItem) {
+fun QueueItemCard(queue: Queue) {
     val interactionSource = remember { MutableInteractionSource() }
     val ripple = rememberRipple(bounded = true)
 
@@ -42,10 +43,10 @@ fun QueueItemCard(queue: QueueItem) {
             Column(modifier = Modifier
                 .padding(16.dp, 16.dp, 0.dp, 16.dp)
                 .weight(1f)) {
-                Text(text = queue.title, style = MaterialTheme.typography.bodyLarge)
+                Text(text = queue.name, style = MaterialTheme.typography.bodyLarge)
                 Text(text = queue.description, style = MaterialTheme.typography.bodyMedium,
                     maxLines = 2, overflow = TextOverflow.Ellipsis)
-                Text(text = "Members: ${queue.members}", style = MaterialTheme.typography.bodyMedium)
+                Text(text = "Members: ${queue.members.size}", style = MaterialTheme.typography.bodyMedium)
             }
             Image(painter = painterResource(id = R.drawable.arrow_right),
                 contentDescription = "arrow right", modifier = Modifier.align(Alignment.CenterVertically))

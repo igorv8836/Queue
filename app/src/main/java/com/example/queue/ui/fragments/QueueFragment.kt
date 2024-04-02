@@ -60,7 +60,6 @@ class QueueFragment : Fragment() {
 fun PreviewQueueScreen(){
     MaterialTheme {
         val queueViewModel = QueueViewModel()
-        queueViewModel.addTestingData()
         QueueScreen(queueViewModel)
     }
 }
@@ -141,7 +140,7 @@ fun Members(queue: Queue, viewModel: QueueViewModel){
             }
             LazyColumn(modifier = Modifier.fillMaxSize()){
                 items(queue.members){user ->
-                    Member(user)
+//                    Member(user)
                 }
 
             }
