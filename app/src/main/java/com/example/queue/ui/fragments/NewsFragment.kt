@@ -1,4 +1,4 @@
-package com.example.queue.fragments
+package com.example.queue.ui.fragments
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment

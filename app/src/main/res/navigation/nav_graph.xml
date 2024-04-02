@@ -20,7 +20,7 @@
 
     <fragment
         android:id="@+id/authFragment"
-        android:name="com.example.queue.fragments.AuthFragment"
+        android:name="com.example.queue.ui.fragments.AuthFragment"
         android:label="fragment_auth"
         tools:layout="@layout/fragment_auth" >
         <action
@@ -35,7 +35,7 @@
 
     <fragment
         android:id="@+id/registerFragment"
-        android:name="com.example.queue.fragments.RegisterFragment"
+        android:name="com.example.queue.ui.fragments.RegisterFragment"
         android:label="fragment_register"
         tools:layout="@layout/fragment_register" >
         <action
@@ -47,23 +47,23 @@
 
     <fragment
         android:id="@+id/newsFragment"
-        android:name="com.example.queue.fragments.NewsFragment"
+        android:name="com.example.queue.ui.fragments.NewsFragment"
         android:label="fragment_news"
         tools:layout="@layout/fragment_news" >
     </fragment>
     <fragment
         android:id="@+id/searchFragment"
-        android:name="com.example.queue.fragments.SearchFragment"
+        android:name="com.example.queue.ui.fragments.SearchFragment"
         android:label="fragment_search"
         tools:layout="@layout/fragment_search" />
     <fragment
         android:id="@+id/queuesFragment"
-        android:name="com.example.queue.fragments.QueuesFragment"
+        android:name="com.example.queue.ui.fragments.QueuesFragment"
         android:label="fragment_queues"
         tools:layout="@layout/fragment_queues" />
     <fragment
         android:id="@+id/settingsFragment"
-        android:name="com.example.queue.fragments.SettingsFragment"
+        android:name="com.example.queue.ui.fragments.SettingsFragment"
         android:label="fragment_settings"
         tools:layout="@layout/fragment_settings" />
 

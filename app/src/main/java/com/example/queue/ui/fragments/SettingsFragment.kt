@@ -1,4 +1,4 @@
-package com.example.queue.fragments
+package com.example.queue.ui.fragments
 
 import android.app.Activity
 import android.content.Intent
@@ -64,33 +64,25 @@ class SettingsFragment : Fragment() {
             }
         }
 
-        val dialogBinding = EditTextBinding.bind(
-            layoutInflater.inflate(R.layout.edit_text, null))
-
         with(binding){
             signOutButton.setOnClickListener { viewModel.signOut() }
             accountImage.setOnClickListener { changePhoto() }
-            changeNicknameButton.setOnClickListener{
-                MaterialAlertDialogBuilder(requireContext())
-                    .setTitle("Изменение никнейма")
-                    .setView(dialogBinding.root)
-                    .setNegativeButton("Отмена") { _, _ -> }
-                    .setPositiveButton("Сохранить") { _, _ ->
-                        viewModel.changeNickname(dialogBinding.inputEditText.text.toString())
-                    }
-                    .show()
+            changeNicknameButton.setOnClickListener {
+                showEditDialog(
+                    title = "Изменение никнейма",
+                    hint = "Введите новый никнейм"
+                ) { newName ->
+                    viewModel.changeNickname(newName)
+                }
             }
-            changePasswordButton.setOnClickListener {
-                dialogBinding.textField.hint = "Введите новый пароль"
 
-                MaterialAlertDialogBuilder(requireContext())
-                    .setTitle("Изменение никнейма")
-                    .setView(dialogBinding.root)
-                    .setNegativeButton("Отмена") { _, _ -> }
-                    .setPositiveButton("Изменить") { _, _ ->
-                        viewModel.changePassword(dialogBinding.inputEditText.text.toString())
-                    }
-                    .show()
+            changePasswordButton.setOnClickListener {
+                showEditDialog(
+                    title = "Изменение пароля",
+                    hint = "Введите новый пароль"
+                ) { newPassword ->
+                    viewModel.changePassword(newPassword)
+                }
             }
         }
     }
@@ -139,5 +131,24 @@ class SettingsFragment : Fragment() {
             data.data?.let { viewModel.changePhoto(it) }
         }
         super.onActivityResult(requestCode, resultCode, data)
+    }
+
+    private fun showEditDialog(
+        title: String,
+        hint: String,
+        onPositiveClick: (String) -> Unit
+    ) {
+        val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.edit_text, null)
+        val dialogBinding = EditTextBinding.bind(dialogView)
+        dialogBinding.textField.hint = hint
+
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(title)
+            .setView(dialogBinding.root)
+            .setNegativeButton("Отмена", null)
+            .setPositiveButton("Сохранить") { _, _ ->
+                onPositiveClick(dialogBinding.inputEditText.text.toString())
+            }
+            .show()
     }
 }

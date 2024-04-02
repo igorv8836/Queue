@@ -9,6 +9,7 @@ import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
+import com.google.firebase.firestore.SetOptions
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.storage
 import kotlinx.coroutines.Dispatchers
@@ -51,7 +52,7 @@ object FirestoreDB {
                 return@withContext Result.failure(NullPointerException())
             val user = hashMapOf("nickname" to nickname)
             val a = firebaseFirestore.collection("users")
-                .document(currUser.uid).update(user as Map<String, Any>).await()
+                .document(currUser.uid).set(user as Map<String, Any>, SetOptions.merge()).await()
             return@withContext Result.success(Unit)
         } catch (e: Exception){
             return@withContext Result.failure(e)
@@ -104,7 +105,8 @@ object FirestoreDB {
     suspend fun savePhotoPath(fileRef: StorageReference): Result<Unit> = withContext(Dispatchers.IO){
         try {
             val user = hashMapOf("photoPath" to fileRef.path)
-            firebaseFirestore.collection("users").document(currUser!!.uid).set(user).await()
+            firebaseFirestore.collection("users")
+                .document(currUser!!.uid).set(user, SetOptions.merge()).await()
             return@withContext Result.success(Unit)
         } catch (e: Exception){
             return@withContext Result.failure(e)

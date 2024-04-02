@@ -33,7 +33,13 @@ object FirebaseAccount {
             }
 
             try {
-                mAuth.signInWithEmailAndPassword(email, password).await()
+                mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener {
+                    if (it.isSuccessful) {
+                        Result.success(Unit)
+                    } else {
+                        it.exception?.let { it1 -> Result.failure(it1) }
+                    }
+                }.await()
                 Result.success(Unit)
             } catch (e: Exception) {
                 Result.failure(e)

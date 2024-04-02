@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:layout_margin="@dimen/margin_medium"
-    tools:context=".fragments.SettingsFragment">
+    tools:context=".ui.fragments.SettingsFragment">
 
     <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/account_image"

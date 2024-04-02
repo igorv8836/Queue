@@ -1,10 +1,11 @@
-package com.example.queue.fragments
+package com.example.queue.ui.fragments
 
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.NavOptions
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import com.example.queue.R
@@ -25,10 +26,13 @@ class MainActivity : AppCompatActivity(), ShowBottomMenuListener {
 
         val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host)
         val navController = navHostFragment?.findNavController()
+        val navOptions = NavOptions.Builder()
+            .setLaunchSingleTop(true)
+            .build()
 
         viewModel.navigateToBaseFragment.observe(this){
             if (it) {
-                navController?.navigate(R.id.action_authFragment_to_newsFragment)
+                navController?.navigate(R.id.action_authFragment_to_newsFragment, null, navOptions)
                 binding.navMenu.visibility = View.VISIBLE
             }
         }
@@ -38,22 +42,22 @@ class MainActivity : AppCompatActivity(), ShowBottomMenuListener {
             override fun onNavigationItemSelected(item: MenuItem): Boolean {
                 when (item.itemId) {
                     R.id.menu_news -> {
-                        navController?.navigate(R.id.action_to_newsFragment)
+                        navController?.navigate(R.id.action_to_newsFragment, null, navOptions)
                         return true
                     }
 
                     R.id.menu_search -> {
-                        navController?.navigate(R.id.action_to_searchFragment)
+                        navController?.navigate(R.id.action_to_searchFragment, null, navOptions)
                         return true
                     }
 
                     R.id.menu_queues -> {
-                        navController?.navigate(R.id.action_to_queuesFragment)
+                        navController?.navigate(R.id.action_to_queuesFragment, null, navOptions)
                         return true
                     }
 
                     R.id.menu_settings -> {
-                        navController?.navigate(R.id.action_to_settingsFragment)
+                        navController?.navigate(R.id.action_to_settingsFragment, null, navOptions)
                         return true
                     }
                 }
