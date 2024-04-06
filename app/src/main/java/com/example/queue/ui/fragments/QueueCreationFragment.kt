@@ -37,6 +37,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.res.painterResource
@@ -49,7 +50,6 @@ import com.example.queue.R
 import com.example.queue.ui.components.TopLoadingBar
 import com.example.queue.viewmodels.QueueCreationViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class CreationQueueFragment : BottomSheetDialogFragment() {
@@ -123,7 +123,7 @@ fun QueueCreationScreen(viewModel: QueueCreationViewModel, onExitClicked: () -> 
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
                 QueueStatus("Закрытая", "Открытая", viewModel::changeQueueClosed)
-                QueueStatus("Одноразовая", "Периодическая", viewModel::changeQueueSingleEvent)
+                QueueStatus("Одноразовая", "Циклическая", viewModel::changeQueueSingleEvent)
             }
         }
     }
@@ -162,9 +162,9 @@ fun MyTextField(hint: String, dataText: String, lines: Int = 1, onTextChange: (S
 
 @Composable
 fun QueueStatus(ableText: String, unableText: String, updateStatus: (Boolean) -> Unit){
-    val isUnable = rememberSaveable() { mutableStateOf(false) }
+    val isAble = rememberSaveable() { mutableStateOf(true) }
     val surfaceColor by animateColorAsState(
-        if (isUnable.value) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
+        if (!isAble.value) Color.Green else MaterialTheme.colorScheme.error,
         label = ""
     )
     Surface(
@@ -175,12 +175,12 @@ fun QueueStatus(ableText: String, unableText: String, updateStatus: (Boolean) ->
             .animateContentSize()
             .padding(8.dp)
             .clickable {
-                isUnable.value = !isUnable.value
-                updateStatus(isUnable.value)
+                isAble.value = !isAble.value
+                updateStatus(isAble.value)
             }
     ){
         Text(
-            text = if (isUnable.value) unableText else ableText,
+            text = if (isAble.value) ableText else unableText,
             style = MaterialTheme.typography.bodyMedium,
             modifier = Modifier.padding(8.dp)
         )

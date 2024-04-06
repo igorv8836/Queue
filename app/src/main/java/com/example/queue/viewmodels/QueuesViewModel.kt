@@ -13,10 +13,12 @@ import kotlinx.coroutines.launch
 
 open class QueuesViewModel: ViewModel() {
     private val repository = QueueRepository
-    private val _queues = MutableStateFlow<List<Queue>>(emptyList())
-    open val queues = _queues.asStateFlow()
     private val _errorText = MutableSharedFlow<String>()
     val errorText: SharedFlow<String> = _errorText
+    private val _queues = MutableStateFlow<List<Queue>>(emptyList())
+    open val queues = _queues.asStateFlow()
+    private val _myQueues = MutableStateFlow<List<Queue>>(emptyList())
+    open val myQueues = _myQueues.asStateFlow()
 
     init {
         getErrorFlow()
@@ -34,8 +36,10 @@ open class QueuesViewModel: ViewModel() {
     private fun getQueuesData(){
         viewModelScope.launch {
             val queuesData = repository.getQueues()
-            if (queuesData.isSuccess)
-                _queues.value = queuesData.getOrNull() ?: emptyList()
+            if (queuesData.isSuccess) {
+                _myQueues.value = queuesData.getOrNull()?.first ?: emptyList()
+                _queues.value = queuesData.getOrNull()?.second ?: emptyList()
+            }
         }
     }
 

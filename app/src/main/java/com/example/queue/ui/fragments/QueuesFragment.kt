@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -28,6 +29,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.tooling.preview.Preview
@@ -77,6 +79,7 @@ fun QueuesScreen(viewModel: QueuesViewModel, fragmentManager: FragmentManager) {
     val pagerState = rememberPagerState()
     val tabIndex = pagerState.currentPage
     val coroutineScope = rememberCoroutineScope()
+    val myQueues by viewModel.myQueues.collectAsState()
     val queues by viewModel.queues.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -98,7 +101,7 @@ fun QueuesScreen(viewModel: QueuesViewModel, fragmentManager: FragmentManager) {
                 TabRow(
                     selectedTabIndex = tabIndex,
                     indicator = { tabPositions ->
-                        TabRowDefaults.PrimaryIndicator(
+                        TabRowDefaults.SecondaryIndicator(
                             Modifier.pagerTabIndicatorOffset(pagerState, tabPositions)
                         )
                     }
@@ -117,15 +120,15 @@ fun QueuesScreen(viewModel: QueuesViewModel, fragmentManager: FragmentManager) {
                 HorizontalPager(
                     count = tabList.size,
                     state = pagerState,
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.fillMaxSize()
                 ) {index ->
                     LazyColumn(
                         modifier = Modifier
-                            .weight(1f)
-                            .padding(it)
+                            .weight(1f).fillMaxSize().padding(it)
                     ) {
-                        items(queues) { queue ->
-                            QueueItemCard(queue)
+                        when(index) {
+                            0 -> items(myQueues) { queue -> QueueItemCard(queue) }
+                            1 -> items(queues) { queue -> QueueItemCard(queue) }
                         }
                     }
                 }

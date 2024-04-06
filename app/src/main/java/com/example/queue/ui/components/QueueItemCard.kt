@@ -70,13 +70,13 @@ fun QueueItemCard(queue: Queue) {
                 )
                 Row {
                     QueueIndicator(
-                        ableText = "Открытый",
-                        unableText = "Закрытый",
+                        ableText = "Открытая",
+                        unableText = "Закрытая",
                         isStatus = queue.isOpen
                     )
                     QueueIndicator(
-                        ableText = "Циклический",
-                        unableText = "Одноразовый",
+                        ableText = "Циклическая",
+                        unableText = "Одноразовая",
                         isStatus = queue.isPeriodic
                     )
                 }

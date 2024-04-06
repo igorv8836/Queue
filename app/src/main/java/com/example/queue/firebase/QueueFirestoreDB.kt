@@ -90,7 +90,12 @@ object QueueFirestoreDB {
                         members.first { it.id == queue["owner"] }
                     )
                 }
-            return@withContext Result.success(queues)
+
+            val myQueue = queues.filter { it.owner.id == currUser?.uid }
+            val otherQueues = queues.filter { it.owner.id != currUser?.uid }
+
+
+            return@withContext Result.success(Pair<List<Queue>, List<Queue>>(myQueue, otherQueues))
         } catch (e: Exception){
             emitError(e)
             return@withContext Result.failure(e)
