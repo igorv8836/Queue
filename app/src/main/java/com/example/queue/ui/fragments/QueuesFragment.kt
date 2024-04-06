@@ -17,11 +17,17 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
+import androidx.compose.material3.TabRowDefaults
+import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.tooling.preview.Preview
@@ -30,7 +36,13 @@ import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.ViewModelProvider
 import com.example.queue.testingData.PreviewQueuesViewModel
 import com.example.queue.ui.components.QueueItemCard
+import com.example.queue.ui.components.pagerTabIndicatorOffset
 import com.example.queue.viewmodels.QueuesViewModel
+import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.accompanist.pager.HorizontalPager
+import com.google.accompanist.pager.pagerTabIndicatorOffset
+import com.google.accompanist.pager.rememberPagerState
+import kotlinx.coroutines.launch
 
 
 class QueuesFragment : Fragment() {
@@ -46,7 +58,7 @@ class QueuesFragment : Fragment() {
     ): View? {
         return ComposeView(requireContext()).apply {
             setContent {
-                MaterialTheme() {
+                MaterialTheme {
                     QueuesScreen(viewModel, parentFragmentManager)
                 }
             }
@@ -58,8 +70,13 @@ class QueuesFragment : Fragment() {
     }
 }
 
+@OptIn(ExperimentalPagerApi::class)
 @Composable
 fun QueuesScreen(viewModel: QueuesViewModel, fragmentManager: FragmentManager) {
+    val tabList = listOf("Мои", "Остальные")
+    val pagerState = rememberPagerState()
+    val tabIndex = pagerState.currentPage
+    val coroutineScope = rememberCoroutineScope()
     val queues by viewModel.queues.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -77,19 +94,47 @@ fun QueuesScreen(viewModel: QueuesViewModel, fragmentManager: FragmentManager) {
             },
             snackbarHost = { SnackbarHost(snackbarHostState) }
         ) {
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(it)
-            ) {
-                items(queues) { queue ->
-                    QueueItemCard(queue)
+            Column {
+                TabRow(
+                    selectedTabIndex = tabIndex,
+                    indicator = { tabPositions ->
+                        TabRowDefaults.PrimaryIndicator(
+                            Modifier.pagerTabIndicatorOffset(pagerState, tabPositions)
+                        )
+                    }
+                ) {
+                    tabList.forEachIndexed { index, s ->
+                        Tab(
+                            selected = tabIndex == index,
+                            onClick = {
+                                   coroutineScope.launch {
+                                       pagerState.animateScrollToPage(index)
+                                   }
+                            },
+                            text = { Text(text = s) })
+                    }
+                }
+                HorizontalPager(
+                    count = tabList.size,
+                    state = pagerState,
+                    modifier = Modifier.weight(1f)
+                ) {index ->
+                    LazyColumn(
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(it)
+                    ) {
+                        items(queues) { queue ->
+                            QueueItemCard(queue)
+                        }
+                    }
                 }
             }
+
         }
 
         LaunchedEffect(key1 = true) {
-            viewModel.errorText.collect{
+            viewModel.errorText.collect {
                 snackbarHostState.showSnackbar(it)
             }
 
@@ -97,11 +142,11 @@ fun QueuesScreen(viewModel: QueuesViewModel, fragmentManager: FragmentManager) {
     }
 }
 
-
-@Preview(showBackground = true)
-@Composable
-fun QueuesScreenPreview() {
-    QueuesScreen(
-        viewModel = PreviewQueuesViewModel(),
-        fragmentManager = object : FragmentManager() {})
-}
+//
+//@Preview(showBackground = true)
+//@Composable
+//fun QueuesScreenPreview() {
+//    QueuesScreen(
+//        viewModel = PreviewQueuesViewModel(),
+//        fragmentManager = object : FragmentManager() {})
+//}
