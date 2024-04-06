@@ -6,6 +6,6 @@ data class Queue(
     val description: String,
     val members: List<Member>,
     val isOpen: Boolean,
-    val isStarted: Boolean,
+    val isPeriodic: Boolean,
     val owner: Member
 )

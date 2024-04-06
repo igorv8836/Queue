@@ -107,7 +107,7 @@ fun MainPart(queue: Queue, viewModel: QueueViewModel){
                 modifier = Modifier.fillMaxWidth()
                 ) {
                 QueueIndicator(text = if (queue.isOpen) "Открытый" else "Закрытый")
-                QueueIndicator(text = if (queue.isStarted) "Запущен" else "Не запущен")
+                QueueIndicator(text = if (queue.isPeriodic) "Запущен" else "Не запущен")
             }
             Text(
                 text = queue.members.size.toString() + " участников",

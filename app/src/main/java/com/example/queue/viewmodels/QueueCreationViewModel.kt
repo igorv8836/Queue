@@ -16,8 +16,8 @@ class QueueCreationViewModel: ViewModel() {
     val creationComplete = MutableStateFlow(false)
     private val _showLoading = MutableStateFlow(false)
     val showLoading: StateFlow<Boolean> = _showLoading
-    private var _isQueueClosed = MutableStateFlow(false)
-    private var _isQueueSingleEvent = MutableStateFlow(false)
+    private var _isQueueClosed = MutableStateFlow(true)
+    private var _isQueueSingleEvent = MutableStateFlow(true)
 
     fun changeQueueClosed(isClosed: Boolean) {
         _isQueueClosed.value = isClosed
