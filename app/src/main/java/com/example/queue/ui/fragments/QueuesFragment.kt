@@ -36,6 +36,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.NavController
+import androidx.navigation.findNavController
+import com.example.queue.R
 import com.example.queue.testingData.PreviewQueuesViewModel
 import com.example.queue.ui.components.QueueItemCard
 import com.example.queue.ui.components.pagerTabIndicatorOffset
@@ -61,7 +64,7 @@ class QueuesFragment : Fragment() {
         return ComposeView(requireContext()).apply {
             setContent {
                 MaterialTheme {
-                    QueuesScreen(viewModel, parentFragmentManager)
+                    QueuesScreen(viewModel, parentFragmentManager, findNavController())
                 }
             }
         }
@@ -74,7 +77,11 @@ class QueuesFragment : Fragment() {
 
 @OptIn(ExperimentalPagerApi::class)
 @Composable
-fun QueuesScreen(viewModel: QueuesViewModel, fragmentManager: FragmentManager) {
+fun QueuesScreen(
+    viewModel: QueuesViewModel,
+    fragmentManager: FragmentManager,
+    navController: NavController
+) {
     val tabList = listOf("Мои", "Остальные")
     val pagerState = rememberPagerState()
     val tabIndex = pagerState.currentPage
@@ -110,9 +117,9 @@ fun QueuesScreen(viewModel: QueuesViewModel, fragmentManager: FragmentManager) {
                         Tab(
                             selected = tabIndex == index,
                             onClick = {
-                                   coroutineScope.launch {
-                                       pagerState.animateScrollToPage(index)
-                                   }
+                                coroutineScope.launch {
+                                    pagerState.animateScrollToPage(index)
+                                }
                             },
                             text = { Text(text = s) })
                     }
@@ -121,14 +128,29 @@ fun QueuesScreen(viewModel: QueuesViewModel, fragmentManager: FragmentManager) {
                     count = tabList.size,
                     state = pagerState,
                     modifier = Modifier.fillMaxSize()
-                ) {index ->
+                ) { index ->
                     LazyColumn(
                         modifier = Modifier
-                            .weight(1f).fillMaxSize().padding(it)
+                            .weight(1f)
+                            .fillMaxSize()
+                            .padding(it)
                     ) {
-                        when(index) {
-                            0 -> items(myQueues) { queue -> QueueItemCard(queue) }
-                            1 -> items(queues) { queue -> QueueItemCard(queue) }
+                        when (index) {
+                            0 -> items(myQueues) { queue ->
+                                QueueItemCard(queue) {
+                                    navController.navigate(
+                                        R.id.action_to_queueFragment,
+                                        Bundle().apply {
+                                            putParcelable("queue", queue)
+                                        })
+                                }
+                            }
+
+                            1 -> items(queues) { queue ->
+                                QueueItemCard(queue) {
+
+                                }
+                            }
                         }
                     }
                 }

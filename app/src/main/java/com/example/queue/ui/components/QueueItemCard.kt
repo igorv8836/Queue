@@ -35,7 +35,7 @@ import com.example.queue.add_classes.Member
 import com.example.queue.add_classes.Queue
 
 @Composable
-fun QueueItemCard(queue: Queue) {
+fun QueueItemCard(queue: Queue, onClick: (Queue) -> Unit) {
     val interactionSource = remember { MutableInteractionSource() }
     val ripple = rememberRipple(bounded = true)
 
@@ -45,7 +45,7 @@ fun QueueItemCard(queue: Queue) {
             .clickable(
                 interactionSource = interactionSource,
                 indication = ripple,
-                onClick = {}
+                onClick = { onClick(queue) }
             )
             .fillMaxWidth(),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
@@ -136,5 +136,5 @@ fun QueueItemCardPreview() {
             true,
             a
         )
-    )
+    ){}
 }

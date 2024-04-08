@@ -10,6 +10,10 @@ class QueueViewModel: ViewModel() {
     private val _queue = MutableStateFlow<Queue?>(null)
     val queue = _queue.asStateFlow()
 
+    fun setReceivedQueue(queue: Queue){
+        _queue.value = queue
+    }
+
     init {
         _queue.value = Queue(
             "1",

@@ -1,5 +1,9 @@
 package com.example.queue.add_classes
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
+
+@Parcelize
 data class Queue(
     val id: String? = null,
     val name: String,
@@ -8,4 +12,4 @@ data class Queue(
     val isOpen: Boolean,
     val isPeriodic: Boolean,
     val owner: Member
-)
+) : Parcelable

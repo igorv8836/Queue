@@ -17,6 +17,9 @@
     <action
         android:id="@+id/action_to_newsFragment"
         app:destination="@id/newsFragment" />
+    <action
+        android:id="@+id/action_to_queueFragment"
+        app:destination="@id/queueFragment" />
 
     <fragment
         android:id="@+id/authFragment"
@@ -59,8 +62,11 @@
     <fragment
         android:id="@+id/queuesFragment"
         android:name="com.example.queue.ui.fragments.QueuesFragment"
-        android:label="fragment_queues"
-        tools:layout="@layout/fragment_queues" />
+        android:label="fragment_queues" />
+    <fragment
+        android:id="@+id/queueFragment"
+        android:name="com.example.queue.ui.fragments.QueueFragment"
+        android:label="fragment_queue" />
     <fragment
         android:id="@+id/settingsFragment"
         android:name="com.example.queue.ui.fragments.SettingsFragment"
