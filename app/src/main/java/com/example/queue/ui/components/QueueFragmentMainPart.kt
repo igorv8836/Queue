@@ -27,7 +27,7 @@ fun QueueFragmentMainPart(viewModel: QueueViewModel) {
     val queue by viewModel.queue.collectAsState()
     Column(
         modifier = Modifier
-            .padding(8.dp)
+            .padding(start = 8.dp, end = 8.dp, bottom = 8.dp)
             .wrapContentHeight()
     ) {
         Column(modifier = Modifier.fillMaxWidth()) {

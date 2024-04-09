@@ -102,6 +102,7 @@ object FirestoreDB {
         }
     }
 
+
     suspend fun savePhotoPath(fileRef: StorageReference): Result<Unit> = withContext(Dispatchers.IO){
         try {
             val user = hashMapOf("photoPath" to fileRef.path)

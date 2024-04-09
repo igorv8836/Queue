@@ -6,6 +6,7 @@ import com.example.queue.add_classes.Queue
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.storage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -50,6 +51,12 @@ object QueueFirestoreDB {
         }
     }
 
+    suspend fun getPhotoUrl(fileRef: String?) = when(fileRef){
+        null, "" -> ""
+        else -> storageRef.child(fileRef).downloadUrl.await().toString()
+    }
+
+
     suspend fun addMember(queueId: String, userId: String, isAdmin: Boolean, position: Int) = withContext(Dispatchers.IO){
         try {
             firebaseFirestore.collection("queues").document(queueId)
@@ -76,7 +83,7 @@ object QueueFirestoreDB {
                             member.id,
                             userData["nickname"] as String,
                             member["isAdmin"] as Boolean,
-                            userData["photoPath"] as String,
+                            getPhotoUrl(userData["photoPath"] as String),
                             (member["position"] as Long).toInt()
                         )
                     }

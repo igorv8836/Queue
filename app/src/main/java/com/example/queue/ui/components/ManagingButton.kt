@@ -2,11 +2,12 @@ package com.example.queue.ui.components
 
 import androidx.annotation.DrawableRes
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateSizeAsState
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
@@ -43,6 +44,12 @@ fun ManagingButton(
             else -> MaterialTheme.colorScheme.primary
         }, label = ""
     )
+    val iconSize by animateDpAsState(
+        targetValue = when {
+            isPressed -> 28.dp
+            else -> 36.dp
+        }, label = ""
+    )
 
     LaunchedEffect(interactionSource) {
         interactionSource.interactions.collect { interaction ->
@@ -76,7 +83,7 @@ fun ManagingButton(
                 painter = painterResource(id = iconResource),
                 contentDescription = "icon",
                 tint = backgroundColor,
-                modifier = Modifier.size(36.dp)
+                modifier = Modifier.size(iconSize)
             )
             Text(
                 text = text,

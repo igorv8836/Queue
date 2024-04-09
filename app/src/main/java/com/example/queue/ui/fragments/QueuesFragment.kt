@@ -148,7 +148,11 @@ fun QueuesScreen(
 
                             1 -> items(queues) { queue ->
                                 QueueItemCard(queue) {
-
+                                    navController.navigate(
+                                        R.id.action_to_queueFragment,
+                                        Bundle().apply {
+                                            putParcelable("queue", queue)
+                                        })
                                 }
                             }
                         }
@@ -166,12 +170,3 @@ fun QueuesScreen(
         }
     }
 }
-
-//
-//@Preview(showBackground = true)
-//@Composable
-//fun QueuesScreenPreview() {
-//    QueuesScreen(
-//        viewModel = PreviewQueuesViewModel(),
-//        fragmentManager = object : FragmentManager() {})
-//}

@@ -53,7 +53,7 @@ fun QueueFragmentMembers(viewModel: QueueViewModel) {
                     contentDescription = "add person icon",
                     tint = MaterialTheme.colorScheme.primary,
                     modifier = Modifier
-                        .padding(start = 8.dp, top = 16.dp)
+                        .padding(start = 8.dp, top = 16.dp, bottom = 8.dp)
                         .size(32.dp)
                 )
                 Text(
@@ -65,12 +65,15 @@ fun QueueFragmentMembers(viewModel: QueueViewModel) {
                         .align(Alignment.CenterVertically),
                 )
             }
-            HorizontalDivider(modifier = Modifier.padding(start = 8.dp, end = 8.dp, bottom = 8.dp))
+            HorizontalDivider(modifier = Modifier.padding(start = 8.dp, end = 8.dp))
 
             LazyColumn(modifier = Modifier.fillMaxSize()) {
                 queue?.let {
                     items(it.members) { user ->
                         QueueMember(user = user)
+                        HorizontalDivider(
+                            modifier = Modifier.padding(start = 8.dp, end = 8.dp)
+                        )
                     }
                 }
 

@@ -1,18 +1,61 @@
 package com.example.queue.ui.components
 
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
+import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
+import com.bumptech.glide.integration.compose.GlideImage
 import com.example.queue.add_classes.Member
 
+@OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun QueueMember(user: Member) {
-    Text(
-        text = user.name,
-        style = MaterialTheme.typography.bodyMedium,
-        modifier = Modifier.padding(4.dp)
-    )
+    Surface(
+        modifier = Modifier.fillMaxWidth().clickable(onClick = {  })
+    ){
+        Row(
+            modifier = Modifier.padding(8.dp).fillMaxWidth()
+        ) {
+            GlideImage(
+                model = user.imagePath,
+                contentDescription = "user photo",
+                modifier = Modifier
+                    .size(46.dp)
+                    .clip(CircleShape)
+                    .align(Alignment.CenterVertically),
+                contentScale = ContentScale.FillBounds
+            )
+            Text(
+                text = user.name,
+                style = MaterialTheme.typography.bodyLarge,
+                modifier = Modifier
+                    .padding(top = 8.dp, start = 8.dp)
+                    .align(Alignment.Top).weight(1f)
+            )
+            if (user.isAdmin){
+                Text(
+                    text = "Создатель",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Color.Gray,
+                    modifier = Modifier.align(Alignment.Top).padding(top = 4.dp, end = 8.dp)
+                )
+            }
+        }
+    }
+
+
 }
