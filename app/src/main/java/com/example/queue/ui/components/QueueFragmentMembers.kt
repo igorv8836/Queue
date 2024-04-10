@@ -10,8 +10,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.text.ClickableText
-import androidx.compose.material.Divider
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -21,11 +19,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.queue.R
 import com.example.queue.viewmodels.QueueViewModel
@@ -33,8 +31,14 @@ import com.example.queue.viewmodels.QueueViewModel
 @Composable
 fun QueueFragmentMembers(viewModel: QueueViewModel) {
     val queue by viewModel.queue.collectAsState()
-    var interactionSource = remember { MutableInteractionSource() }
-    var indication = rememberRipple(bounded = true)
+    val showingAddingDialog = remember { mutableStateOf(false) }
+    val interactionSource = remember { MutableInteractionSource() }
+    val indication = rememberRipple(bounded = true)
+
+    if (showingAddingDialog.value){
+        AddingUserDialog(viewModel)
+    }
+
     Surface(
         shape = MaterialTheme.shapes.medium,
         shadowElevation = 4.dp,
@@ -44,9 +48,13 @@ fun QueueFragmentMembers(viewModel: QueueViewModel) {
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
             Row(
-                modifier = Modifier.fillMaxWidth().clickable(
-                    onClick = {  }
-                ),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable(
+                        interactionSource = interactionSource,
+                        indication = indication,
+                        onClick = { }
+                    ),
             ){
                 Icon(
                     painter = painterResource(id = R.drawable.person_add_icon),
@@ -76,9 +84,12 @@ fun QueueFragmentMembers(viewModel: QueueViewModel) {
                         )
                     }
                 }
-
-
             }
         }
     }
+}
+
+@Composable
+fun AddingUserDialog(viewModel: QueueViewModel) {
+
 }

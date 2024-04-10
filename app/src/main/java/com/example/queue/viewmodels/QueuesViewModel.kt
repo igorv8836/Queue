@@ -35,10 +35,9 @@ open class QueuesViewModel: ViewModel() {
 
     private fun getQueuesData(){
         viewModelScope.launch {
-            val queuesData = repository.getQueues()
-            if (queuesData.isSuccess) {
-                _myQueues.value = queuesData.getOrNull()?.first ?: emptyList()
-                _queues.value = queuesData.getOrNull()?.second ?: emptyList()
+            repository.getQueues().collect{
+                _myQueues.value = it.first
+                _queues.value = it.second
             }
         }
     }

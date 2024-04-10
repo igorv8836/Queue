@@ -106,10 +106,4 @@ dependencies {
 
     implementation("com.github.bumptech.glide:glide:4.16.0")
     implementation("com.github.bumptech.glide:compose:1.0.0-beta01")
-
-    ksp("androidx.room:room-compiler:$room_version")
-    implementation("androidx.room:room-runtime:$room_version")
-    implementation("androidx.room:room-ktx:$room_version")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3") // Add Coroutine dependency
-
 }

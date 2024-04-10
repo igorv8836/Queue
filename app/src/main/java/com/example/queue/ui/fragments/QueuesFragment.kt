@@ -141,7 +141,7 @@ fun QueuesScreen(
                                     navController.navigate(
                                         R.id.action_to_queueFragment,
                                         Bundle().apply {
-                                            putParcelable("queue", queue)
+                                            putString("queue", queue.id)
                                         })
                                 }
                             }
@@ -151,7 +151,7 @@ fun QueuesScreen(
                                     navController.navigate(
                                         R.id.action_to_queueFragment,
                                         Bundle().apply {
-                                            putParcelable("queue", queue)
+                                            putString("queue", queue.id)
                                         })
                                 }
                             }

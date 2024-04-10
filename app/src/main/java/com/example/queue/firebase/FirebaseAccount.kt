@@ -8,14 +8,12 @@ import kotlinx.coroutines.withContext
 object FirebaseAccount {
     private val mAuth: FirebaseAuth = FirebaseAuth.getInstance()
 
-    suspend fun registerAccount(email: String, password: String, nickname: String): Result<Unit> =
+    suspend fun registerAccount(email: String, password: String): Result<Unit> =
         withContext(Dispatchers.IO) {
-            if (email.isEmpty() || password.isEmpty() || nickname.isEmpty()) {
+            if (email.isEmpty() || password.isEmpty()) {
                 return@withContext Result.failure(IllegalArgumentException("Все поля должны быть заполнены"))
             } else if (password.length < 6) {
                 return@withContext Result.failure(IllegalArgumentException("Пароль должен содержат не менее 6 символов"))
-            } else if (nickname.length < 3) {
-                return@withContext Result.failure(IllegalArgumentException("Никнейм должен содержать не менее 3 символов"))
             }
 
             try {

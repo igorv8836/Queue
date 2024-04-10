@@ -2,15 +2,18 @@ package com.example.queue.ui.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -24,8 +27,14 @@ import com.example.queue.add_classes.Member
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun QueueMember(user: Member) {
+    val interactionSource = remember { MutableInteractionSource() }
+    val indication = rememberRipple(bounded = true)
     Surface(
-        modifier = Modifier.fillMaxWidth().clickable(onClick = {  })
+        modifier = Modifier.fillMaxWidth().clickable(
+            interactionSource = interactionSource,
+            indication = indication,
+            onClick = {  }
+        )
     ){
         Row(
             modifier = Modifier.padding(8.dp).fillMaxWidth()

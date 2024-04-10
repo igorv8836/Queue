@@ -13,60 +13,95 @@ import com.google.firebase.firestore.SetOptions
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.storage
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.channelFlow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.lang.IllegalArgumentException
-import java.lang.NullPointerException
+import java.util.Date
 import java.util.UUID
+import kotlin.NullPointerException
 
 object FirestoreDB {
     @SuppressLint("StaticFieldLeak")
     private val firebaseFirestore = FirebaseFirestore.getInstance()
     private val storageRef = Firebase.storage.reference
     private val currUser = FirebaseAuth.getInstance().currentUser
+    val errorChannel = MutableSharedFlow<Exception>()
 
-    suspend fun getNewsData(): Result<List<NewsItem>> = withContext(Dispatchers.IO){
-        try {
-            val snapshot = firebaseFirestore.collection("news")
-                .orderBy("date", Query.Direction.DESCENDING).get().await()
+    fun getNews(): Flow<List<NewsItem>> = callbackFlow {
+        val collectionRef = firebaseFirestore.collection("news")
+            .orderBy("date", Query.Direction.DESCENDING)
 
-            val data = snapshot.documents.map { doc ->
-                NewsItem(
-                    doc.getString("title") ?: error("Пустое название"),
-                    doc.getString("text") ?: error("Пустое описание"),
-                    doc.getTimestamp("date")?.toDate() ?: error("Пустая дата")
-                )
+        val listener = collectionRef.addSnapshotListener { snapshot, e ->
+            if (e != null) {
+                errorChannel.tryEmit(e)
+                close(e)
+                return@addSnapshotListener
             }
-            return@withContext Result.success(data)
-        } catch (e: Exception) {
-            return@withContext Result.failure(e)
+
+            if (snapshot != null) {
+                val data = snapshot.documents.mapNotNull { doc ->
+                    try {
+                        NewsItem(
+                            title = doc.getString("title") ?: "",
+                            text = doc.getString("text") ?: "",
+                            date = doc.getTimestamp("date")?.toDate() ?: Date(0)
+                        )
+                    } catch (e: Exception) {
+                        errorChannel.tryEmit(e)
+                        null
+                    }
+                }
+                trySend(data)
+            }
         }
+        awaitClose { listener.remove() }
     }
 
-    suspend fun setNickname(nickname: String): Result<Unit> = withContext(Dispatchers.IO){
+    suspend fun setNickname(nickname: String): Result<Unit> = withContext(Dispatchers.IO) {
         try {
             if (nickname.length <= 3)
                 return@withContext Result.failure(IllegalArgumentException("Длина должна быть больше 3 символов"))
             if (currUser == null)
-                return@withContext Result.failure(NullPointerException())
+                return@withContext Result.failure(NullPointerException("Текущий пользователь не определен"))
+            val usersCollection = firebaseFirestore.collection("users")
+
+            val querySnapshot = usersCollection.whereEqualTo("nickname", nickname).get().await()
+            if (!querySnapshot.isEmpty) {
+                return@withContext Result.failure(Exception("Никнейм уже занят"))
+            }
+
             val user = hashMapOf("nickname" to nickname)
-            val a = firebaseFirestore.collection("users")
-                .document(currUser.uid).set(user as Map<String, Any>, SetOptions.merge()).await()
-            return@withContext Result.success(Unit)
-        } catch (e: Exception){
-            return@withContext Result.failure(e)
+            usersCollection.document(currUser.uid).set(user, SetOptions.merge()).await()
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
         }
     }
 
-    suspend fun getNickname(): Result<String> = withContext(Dispatchers.IO){
+    suspend fun getNickname(): Flow<String> = channelFlow{
         try {
             if (currUser == null)
-                return@withContext Result.failure(NullPointerException())
-            val res = firebaseFirestore.collection("users").document(currUser.uid).get().await()
-            return@withContext Result.success(res.get("nickname").toString())
+                errorChannel.tryEmit(NullPointerException("Пользователь не авторизован"))
+            else {
+                val res = firebaseFirestore.collection("users")
+                    .document(currUser.uid).addSnapshotListener{ nickname, error ->
+                        if (error != null) {
+                            errorChannel.tryEmit(error)
+                            return@addSnapshotListener
+                        }
+                        trySend(nickname?.get("nickname").toString())
+                    }
+                awaitClose { res.remove() }
+            }
         } catch (e: Exception){
-            return@withContext Result.failure(e)
+            errorChannel.tryEmit(e)
         }
     }
 

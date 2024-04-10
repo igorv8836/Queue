@@ -16,12 +16,14 @@ class NewsViewModel: ViewModel() {
     private val repository = FirestoreRepository
     fun loadNews() {
         viewModelScope.launch {
-            val res = repository.getNews()
-            if (res.isSuccess){
-                res.getOrNull()?.let { _newsData.postValue(it) }
-            } else {
-                _helpingText.postValue(res.exceptionOrNull()?.message)
+            val res = repository.getNews().collect{
+                _newsData.value = it
             }
+//            if (res.isSuccess){
+//                res.getOrNull()?.let { _newsData.postValue(it) }
+//            } else {
+//                _helpingText.postValue(res.exceptionOrNull()?.message)
+//            }
         }
     }
 

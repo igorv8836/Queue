@@ -16,8 +16,8 @@ class RegisterViewModel : ViewModel() {
 
     fun registerAccount(email: String, password: String, nickname: String) {
         viewModelScope.launch {
-            val res = accRepository.registerAccount(email, password, nickname)
             val res2 = accRepository.addNickname(nickname)
+            val res = accRepository.registerAccount(email, password, nickname)
             if (res.isSuccess && res2.isSuccess) {
                 _navigateToBaseFragment.postValue(true)
             } else if (res.isFailure) {

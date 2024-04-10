@@ -32,6 +32,7 @@ fun ManagingButton(
     @DrawableRes iconResource: Int,
     text: String,
     isAbled: Boolean,
+    color: Color = MaterialTheme.colorScheme.primary,
     onClick: () -> Unit
 ) {
     val interactionSource = remember { MutableInteractionSource() }
@@ -41,7 +42,7 @@ fun ManagingButton(
         targetValue = when {
             !isAbled -> Color.LightGray
             isPressed -> Color.DarkGray
-            else -> MaterialTheme.colorScheme.primary
+            else -> color
         }, label = ""
     )
     val iconSize by animateDpAsState(

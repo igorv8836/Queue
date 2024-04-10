@@ -2,13 +2,12 @@ package com.example.queue.repositories
 
 import android.net.Uri
 import com.example.queue.firebase.FirestoreDB
-import com.google.firebase.storage.StorageReference
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 object FirestoreRepository {
     private val firestore = FirestoreDB
-    suspend fun getNews() = firestore.getNewsData()
+    fun getNews() = firestore.getNews()
     suspend fun getNickname() = firestore.getNickname()
     suspend fun getUserImage() = withContext(Dispatchers.IO){
         firestore.getUserImagePath().getOrNull()?.let {

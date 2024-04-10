@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.queue.repositories.AccountRepository
 import com.example.queue.repositories.FirestoreRepository
 import com.google.firebase.storage.StorageReference
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import java.io.File
 
@@ -40,11 +41,8 @@ class SettingsViewModel: ViewModel() {
 
     private fun getNickname(){
         viewModelScope.launch {
-            val res = firestoreRep.getNickname()
-            if (res.isSuccess){
-                _nickname.postValue(res.getOrNull())
-            } else {
-                _helpingText.postValue(res.exceptionOrNull()?.message)
+            firestoreRep.getNickname().collect{
+                _nickname.postValue(it)
             }
         }
     }

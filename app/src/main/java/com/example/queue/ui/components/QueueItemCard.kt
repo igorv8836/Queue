@@ -6,10 +6,8 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.ripple.rememberRipple
@@ -68,18 +66,6 @@ fun QueueItemCard(queue: Queue, onClick: (Queue) -> Unit) {
                     text = "Участников: ${queue.members.size}",
                     style = MaterialTheme.typography.bodyMedium
                 )
-                Row {
-                    QueueIndicator(
-                        ableText = "Открытая",
-                        unableText = "Закрытая",
-                        isStatus = queue.isOpen
-                    )
-                    QueueIndicator(
-                        ableText = "Циклическая",
-                        unableText = "Одноразовая",
-                        isStatus = queue.isPeriodic
-                    )
-                }
             }
             Image(
                 painter = painterResource(id = R.drawable.arrow_right),
@@ -89,30 +75,6 @@ fun QueueItemCard(queue: Queue, onClick: (Queue) -> Unit) {
 
         }
 
-    }
-}
-
-@Composable
-fun QueueIndicator(ableText: String, unableText: String, isStatus: Boolean) {
-    val isUnable = rememberSaveable() { mutableStateOf(isStatus) }
-    val surfaceColor by animateColorAsState(
-        if (!isUnable.value) Color.Green else MaterialTheme.colorScheme.error,
-        label = ""
-    )
-    Surface(
-        shape = MaterialTheme.shapes.extraLarge,
-        shadowElevation = 4.dp,
-        color = surfaceColor,
-        modifier = Modifier
-            .animateContentSize()
-            .padding(8.dp)
-            .border(2.dp, Color.White, MaterialTheme.shapes.extraLarge)
-    ) {
-        Text(
-            text = if (isUnable.value) unableText else ableText,
-            style = MaterialTheme.typography.bodyMedium,
-            modifier = Modifier.padding(8.dp)
-        )
     }
 }
 
@@ -133,8 +95,7 @@ fun QueueItemCardPreview() {
             "description",
             listOf(a, a, a),
             true,
-            true,
             a
         )
-    ){}
+    ) {}
 }
