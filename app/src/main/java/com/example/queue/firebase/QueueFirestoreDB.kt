@@ -7,7 +7,9 @@ import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.SetOptions
 import com.google.firebase.storage.storage
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -16,7 +18,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.channelFlow
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
@@ -30,13 +31,15 @@ object QueueFirestoreDB {
     val errorFlow: SharedFlow<Exception> = _errorFlow
 
     private fun emitError(e: Exception) {
-        _errorFlow.tryEmit(e)
+        CoroutineScope(Dispatchers.Default).launch {
+            _errorFlow.emit(e)
+        }
     }
 
     fun getCurrentUserId() = currUser?.uid ?: ""
 
     suspend fun createQueue(
-        name: String, description: String, isOpened: Boolean, isPeriodic: Boolean
+        name: String, description: String, isOpened: Boolean
     ) = withContext(Dispatchers.IO) {
         try {
             if (name.length < 3 || description.length < 3) throw Exception("Имя или описание слишком короткие, нужно больше 3 символов")
@@ -83,15 +86,15 @@ object QueueFirestoreDB {
 
     suspend fun getQueue(id: String) = channelFlow<Queue?> {
         val listener = firebaseFirestore.collection("queues").document(id)
-            .addSnapshotListener{ snapshot, error ->
-                if (error != null){
+            .addSnapshotListener { snapshot, error ->
+                if (error != null) {
                     emitError(error)
                     return@addSnapshotListener
                 }
                 launch {
                     val queue = snapshot?.let {
                         val members = snapshot.reference.collection("members")
-                            .get().await().documents.map {member ->
+                            .get().await().documents.map { member ->
                                 val userData = firebaseFirestore.collection("users")
                                     .document(member.id).get().await()
                                 Member(
@@ -118,61 +121,57 @@ object QueueFirestoreDB {
                     trySend(queue)
                 }
             }
-        awaitClose{ listener.remove() }
+        awaitClose { listener.remove() }
     }
 
     suspend fun getQueues(): Flow<Pair<List<Queue>, List<Queue>>> = channelFlow {
-        try {
-            val queuesListener = firebaseFirestore.collection("queues")
-                .whereArrayContains("members", currUser?.uid ?: "")
-                .addSnapshotListener { queuesSnapshot, queueError ->
-                    if (queueError != null) {
-                        _errorFlow.tryEmit(queueError)
-                        return@addSnapshotListener
-                    }
-
-                    launch {
-                        val queues = queuesSnapshot?.documents?.map { queue ->
-                            async(Dispatchers.IO) {
-                                val members = queue.reference.collection("members").get()
-                                    .await().documents.map { member ->
-                                        val userData = firebaseFirestore.collection("users")
-                                            .document(member.id).get().await()
-                                        Member(
-                                            member.id,
-                                            userData["nickname"] as String,
-                                            member["isAdmin"] as Boolean,
-                                            getPhotoUrl(userData["photoPath"] as String),
-                                            (member["position"] as Long).toInt()
-                                        )
-                                    }
-                                val creator = if (members.isEmpty())
-                                    Member("", "", false, "", 0)
-                                else
-                                    members.first { it.id == queue["owner"] }
-                                Queue(
-                                    queue.id,
-                                    queue["name"] as String,
-                                    queue["description"] as String,
-                                    members,
-                                    queue["isStarted"] as Boolean,
-                                    creator
-                                )
-                            }
-                        }?.awaitAll()
-
-                        val myQueue = queues?.filter { it.owner.id == currUser?.uid } ?: emptyList()
-                        val otherQueues =
-                            queues?.filter { it.owner.id != currUser?.uid } ?: emptyList()
-
-                        trySend(Pair(myQueue, otherQueues))
-                    }
+        val queuesListener = firebaseFirestore.collection("queues")
+            .whereArrayContains("members", currUser?.uid ?: "")
+            .addSnapshotListener { queuesSnapshot, queueError ->
+                if (queueError != null) {
+                    _errorFlow.tryEmit(queueError)
+                    return@addSnapshotListener
                 }
 
-            awaitClose { queuesListener.remove() }
-        } catch (e: Exception) {
-            _errorFlow.tryEmit(e)
-        }
+                launch {
+                    val queues = queuesSnapshot?.documents?.map { queue ->
+                        async(Dispatchers.IO) {
+                            val members = queue.reference.collection("members").get()
+                                .await().documents.map { member ->
+                                    val userData = firebaseFirestore.collection("users")
+                                        .document(member.id).get().await()
+                                    Member(
+                                        member.id,
+                                        userData["nickname"] as String,
+                                        member["isAdmin"] as Boolean,
+                                        getPhotoUrl(userData["photoPath"] as String),
+                                        (member["position"] as Long).toInt()
+                                    )
+                                }
+                            val creator = if (members.isEmpty())
+                                Member("", "", false, "", 0)
+                            else
+                                members.first { it.id == queue["owner"] }
+                            Queue(
+                                queue.id,
+                                queue["name"] as String,
+                                queue["description"] as String,
+                                members,
+                                queue["isStarted"] as Boolean,
+                                creator
+                            )
+                        }
+                    }?.awaitAll()
+
+                    val myQueue = queues?.filter { it.owner.id == currUser?.uid } ?: emptyList()
+                    val otherQueues =
+                        queues?.filter { it.owner.id != currUser?.uid } ?: emptyList()
+
+                    trySend(Pair(myQueue, otherQueues))
+                }
+            }
+
+        awaitClose { queuesListener.remove() }
     }
 
     suspend fun deleteQueue(id: String): Result<Boolean> = withContext(Dispatchers.IO) {
@@ -205,9 +204,31 @@ object QueueFirestoreDB {
         return@withContext Result.success(true)
     }
 
-    suspend fun changeIsStarting(queueId: String, isStarted: Boolean) = withContext(Dispatchers.IO) {
-        firebaseFirestore.collection("queues")
-            .document(queueId).update("isStarted", isStarted).await()
-       return@withContext Result.success(true)
+    suspend fun changeIsStarting(queueId: String, isStarted: Boolean) =
+        withContext(Dispatchers.IO) {
+            firebaseFirestore.collection("queues")
+                .document(queueId).update("isStarted", isStarted).await()
+            return@withContext Result.success(true)
+        }
+
+    suspend fun sendInvitation(queueId: String, nickname: String): Result<Unit> {
+        return try {
+            val userId = firebaseFirestore.collection("users")
+                .whereEqualTo("nickname", nickname).get().await().documents[0].id
+            firebaseFirestore.collection("queues")
+                .document(queueId)
+            val queueRef = firebaseFirestore.collection("queues").document(queueId)
+            val updateData = mapOf("invitations" to FieldValue.arrayUnion(userId))
+            queueRef.set(updateData, SetOptions.merge()).await()
+            Result.success(Unit)
+        } catch (e: IndexOutOfBoundsException) {
+            val err = IllegalArgumentException("Такой пользователь не найден")
+            emitError(err)
+            Result.failure(err)
+        } catch (e: Exception) {
+            emitError(e)
+            Result.failure(e)
+        }
+
     }
 }

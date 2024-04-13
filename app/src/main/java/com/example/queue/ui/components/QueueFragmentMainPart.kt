@@ -14,6 +14,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
@@ -112,20 +113,13 @@ fun QueueFragmentMainPart(viewModel: QueueViewModel) {
                 modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 val isAbled = (userId == queue?.owner?.id && userId != null)
-                ManagingButton(
-                    iconResource = if (queue?.isStarted == true)
-                        R.drawable.start_icon
-                    else
-                        R.drawable.stop_icon,
-                    text = if (queue?.isStarted == true)
-                        "Запустить"
-                    else
-                        "Остановить",
+                ManagingButton(iconResource = if (queue?.isStarted == true) R.drawable.start_icon
+                else R.drawable.stop_icon,
+                    text = if (queue?.isStarted == true) "Запустить"
+                    else "Остановить",
                     isAbled = isAbled,
-                    color = if (queue?.isStarted == true)
-                        MaterialTheme.colorScheme.primary
-                    else
-                        Color.Red,
+                    color = if (queue?.isStarted == true) MaterialTheme.colorScheme.primary
+                    else Color.Red,
                     onClick = { viewModel.startQueue() })
                 ManagingButton(iconResource = R.drawable.restart_icon,
                     text = "Перезапустить",
@@ -146,58 +140,42 @@ fun QueueFragmentMainPart(viewModel: QueueViewModel) {
 
 @Composable
 fun DeletingAlertDialog(viewModel: QueueViewModel, showDeletingDialog: MutableState<Boolean>) {
-    AlertDialog(
-        title = { Text(text = "Подтвердите удаление") },
+    AlertDialog(title = { Text(text = "Подтвердите удаление") },
         text = { Text(text = "Вы действительно хотите удалить очередь?") },
         onDismissRequest = { showDeletingDialog.value = false },
         confirmButton = {
-            Button(
-                colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
-                onClick = {
-                    viewModel.deleteQueue()
-                    showDeletingDialog.value = false
-                }
-            ) {
+            TextButton(onClick = {
+                viewModel.deleteQueue()
+                showDeletingDialog.value = false
+            }) {
                 Text(text = "Удалить", color = Color.Red)
             }
         },
         dismissButton = {
-            Button(
-                colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
-                onClick = { showDeletingDialog.value = false }
-            ) {
-                Text(text = "Отмена", color = MaterialTheme.colorScheme.primary)
+            TextButton(onClick = { showDeletingDialog.value = false }) {
+                Text(text = "Отмена")
             }
-        }
-    )
+        })
 }
 
 @Composable
-fun ExitingAlertDialog(viewModel: QueueViewModel, showDeletingDialog: MutableState<Boolean>) {
-    AlertDialog(
-        title = { Text(text = "Подтвердите выход") },
+fun ExitingAlertDialog(viewModel: QueueViewModel, showExitingDialog: MutableState<Boolean>) {
+    AlertDialog(title = { Text(text = "Подтвердите выход") },
         text = { Text(text = "Вы действительно хотите выйти из очереди?") },
-        onDismissRequest = { showDeletingDialog.value = false },
+        onDismissRequest = { showExitingDialog.value = false },
         confirmButton = {
-            Button(
-                colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
-                onClick = {
-                    viewModel.exitFromQueue()
-                    showDeletingDialog.value = false
-                }
-            ) {
+            TextButton(onClick = {
+                viewModel.exitFromQueue()
+                showExitingDialog.value = false
+            }) {
                 Text(text = "Выйти", color = Color.Red)
             }
         },
         dismissButton = {
-            Button(
-                colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
-                onClick = { showDeletingDialog.value = false }
-            ) {
-                Text(text = "Отмена", color = MaterialTheme.colorScheme.primary)
+            TextButton(onClick = { showExitingDialog.value = false }) {
+                Text(text = "Отмена")
             }
-        }
-    )
+        })
 }
 
 fun getCountText(num: Int) = when (num) {

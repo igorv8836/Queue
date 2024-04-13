@@ -30,7 +30,7 @@ class QueueCreationViewModel: ViewModel() {
     fun createQueue(title: String, description: String) {
         _showLoading.value = true
         viewModelScope.launch {
-            val res = repository.createQueue(title, description, _isQueueClosed.value, _isQueueSingleEvent.value)
+            val res = repository.createQueue(title, description, _isQueueClosed.value)
             if (res.isSuccess) {
                 _showLoading.value = false
                 creationComplete.value = true

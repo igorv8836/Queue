@@ -12,10 +12,14 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
@@ -23,7 +27,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import com.example.queue.R
-import com.example.queue.add_classes.Queue
 import com.example.queue.ui.components.QueueFragmentMainPart
 import com.example.queue.ui.components.QueueFragmentMembers
 import com.example.queue.viewmodels.QueueViewModel
@@ -57,29 +60,28 @@ class QueueFragment : Fragment() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun QueueScreen(viewModel: QueueViewModel, navController: NavController) {
-    Scaffold(topBar = {
-        TopAppBar(title = { }, navigationIcon = {
-            IconButton(onClick = {
-                navController.navigate(R.id.action_to_queuesFragment)
-            }) {
-                Icon(
-                    Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null
-                )
-            }
-        })
-    }) {
+    val snackbarHostState = remember { SnackbarHostState() }
+    Scaffold(
+        topBar = {
+            TopAppBar(title = { }, navigationIcon = {
+                IconButton(onClick = {
+                    navController.navigate(R.id.action_to_queuesFragment)
+                }) {
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
+                }
+            })
+        },
+        snackbarHost = { SnackbarHost(snackbarHostState) }
+
+        ) {
         Column(modifier = Modifier.padding(it)) {
             QueueFragmentMainPart(viewModel = viewModel)
             QueueFragmentMembers(viewModel = viewModel)
         }
     }
-
+    LaunchedEffect(key1 = true){
+        viewModel.helpingText.collect{
+            it?.let { snackbarHostState.showSnackbar(it) }
+        }
+    }
 }
-
-//@Preview(showBackground = true)
-//@Composable
-//fun PreviewQueueScreen() {
-//    val queueViewModel = QueueViewModel()
-//    QueueScreen(
-//        queueViewModel
-//}

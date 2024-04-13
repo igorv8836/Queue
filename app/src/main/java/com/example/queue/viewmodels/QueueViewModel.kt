@@ -16,6 +16,12 @@ class QueueViewModel : ViewModel() {
     val userId = _userId.asStateFlow()
     private val _isDeleted = MutableStateFlow<Boolean>(false)
     val isDeleted = _isDeleted.asStateFlow()
+    private val _helpingText = MutableStateFlow<String?>(null)
+    val helpingText = _helpingText.asStateFlow()
+
+    init {
+        checkError()
+    }
 
     fun getQueue(id: String) {
         viewModelScope.launch {
@@ -24,6 +30,14 @@ class QueueViewModel : ViewModel() {
             }
         }
 
+    }
+
+    fun checkError(){
+        viewModelScope.launch {
+            queueRepository.getErrorFlow().collect {
+                _helpingText.value = it.message
+            }
+        }
     }
 
     fun getCurrentUser() {
@@ -61,6 +75,16 @@ class QueueViewModel : ViewModel() {
         viewModelScope.launch {
             queue.value?.let {queue ->
                 queue.id?.let { queueRepository.changeIsStarted(it, !queue.isStarted)  }
+            }
+        }
+    }
+
+    fun sendInvitation(nickname: String){
+        viewModelScope.launch {
+            queue.value?.id?.let {
+                val res = queueRepository.sendInvitation(it, nickname)
+                if (res.isSuccess)
+                    _helpingText.value = "Приглашение отправлено"
             }
         }
     }

@@ -7,9 +7,8 @@ object QueueRepository {
     suspend fun createQueue(
         name: String,
         description: String,
-        isOpened: Boolean,
-        isPeriodic: Boolean
-    ) = firestore.createQueue(name, description, isOpened, isPeriodic)
+        isOpened: Boolean
+    ) = firestore.createQueue(name, description, isOpened)
 
     suspend fun getQueues() = firestore.getQueues()
 
@@ -25,4 +24,7 @@ object QueueRepository {
         firestore.changeIsStarting(queueId, isStarted)
 
     suspend fun getQueue(id: String) = firestore.getQueue(id)
+
+    suspend fun sendInvitation(queueId: String, nickname: String) =
+        firestore.sendInvitation(queueId, nickname)
 }
