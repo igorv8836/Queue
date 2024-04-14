@@ -22,11 +22,13 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.FractionalThreshold
 import androidx.compose.material.SwipeToDismiss
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.rememberDismissState
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DismissValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -104,7 +106,6 @@ fun QueueFragmentMembers(viewModel: QueueViewModel) {
                 queue?.let {
                     itemsIndexed(it.members) { _, user ->
                         val dismissState = rememberDismissState()
-
                         if (dismissState.isDismissed(DismissDirection.EndToStart)) {
 
                         }
@@ -118,47 +119,46 @@ fun QueueFragmentMembers(viewModel: QueueViewModel) {
                             background = {
                                 val color by animateColorAsState(
                                     when (dismissState.targetValue) {
-                                        androidx.compose.material.DismissValue.Default -> Color.White
-                                        else -> Color.Red
+                                        androidx.compose.material.DismissValue.Default -> MaterialTheme.colorScheme.surface
+                                        else -> Color.Green
                                     }, label = ""
                                 )
                                 val alignment = Alignment.CenterEnd
-                                val icon = Icons.Default.Delete
+                                val icon = Icons.Filled.Check
 
                                 val scale by animateFloatAsState(
-                                    if (dismissState.targetValue == androidx.compose.material.DismissValue.Default) 0.75f else 1f,
+                                    if (dismissState.targetValue == androidx.compose.material.DismissValue.Default)
+                                        0.75f
+                                    else
+                                        1f,
                                     label = ""
                                 )
                                 Box(
                                     Modifier
                                         .fillMaxSize()
                                         .background(color)
-                                        .padding(horizontal = Dp(20f)),
+                                        .padding(horizontal = 20.dp),
                                     contentAlignment = alignment
                                 ) {
                                     Icon(
                                         icon,
-                                        contentDescription = "Delete Icon",
+                                        contentDescription = "Check Icon",
                                         modifier = Modifier.scale(scale)
                                     )
                                 }
                             },
                             dismissContent = {
-                                androidx.compose.material.Card(
-                                    elevation = animateDpAsState(
+                                Card(
+                                    elevation = CardDefaults.cardElevation(animateDpAsState(
                                         if (dismissState.dismissDirection != null) 4.dp else 0.dp,
                                         label = ""
-                                    ).value,
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .height(Dp(50f))
-                                        .align(alignment = Alignment.CenterVertically)
+                                    ).value),
+                                    modifier = Modifier.fillMaxWidth()
                                 ) {
                                     QueueMember(user = user)
                                 }
                             }
                         )
-
                         HorizontalDivider(
                             modifier = Modifier.padding(start = 8.dp, end = 8.dp)
                         )
