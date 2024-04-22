@@ -64,24 +64,35 @@ object FirestoreDB {
         awaitClose { listener.remove() }
     }
 
-    suspend fun setNickname(nickname: String): Result<Unit> = withContext(Dispatchers.IO) {
+    suspend fun setNickname(nickname: String, uid: String? = null): Result<Unit> = withContext(Dispatchers.IO) {
         try {
             if (nickname.length <= 3)
                 return@withContext Result.failure(IllegalArgumentException("Длина должна быть больше 3 символов"))
-            if (currUser == null)
+            if (currUser == null && uid == null)
                 return@withContext Result.failure(NullPointerException("Текущий пользователь не определен"))
             val usersCollection = firebaseFirestore.collection("users")
 
-            val querySnapshot = usersCollection.whereEqualTo("nickname", nickname).get().await()
-            if (!querySnapshot.isEmpty) {
+            if (isUniqueNickname(nickname).isSuccess && !isUniqueNickname(nickname).getOrNull()!!) {
                 return@withContext Result.failure(Exception("Никнейм уже занят"))
             }
 
             val user = hashMapOf("nickname" to nickname)
-            usersCollection.document(currUser.uid).set(user, SetOptions.merge()).await()
+            usersCollection.document(uid ?: currUser?.uid ?: "").set(user, SetOptions.merge()).await()
             Result.success(Unit)
         } catch (e: Exception) {
-            Result.failure(e)
+             Result.failure(e)
+        }
+    }
+
+    suspend fun isUniqueNickname(nickname: String): Result<Boolean> = withContext(Dispatchers.IO){
+        try {
+            if (nickname.length <= 3)
+                return@withContext Result.failure(IllegalArgumentException("Длина должна быть больше 3 символов"))
+            val usersCollection = firebaseFirestore.collection("users")
+            val querySnapshot = usersCollection.whereEqualTo("nickname", nickname).get().await()
+            return@withContext Result.success(querySnapshot.isEmpty)
+        } catch (e: Exception){
+            return@withContext Result.failure(e)
         }
     }
 

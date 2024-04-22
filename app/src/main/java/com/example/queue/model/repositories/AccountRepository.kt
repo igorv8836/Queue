@@ -11,14 +11,18 @@ object AccountRepository {
 
     suspend fun registerAccount(email: String, password: String, nickname: String): Result<Unit> =
         withContext(Dispatchers.Default) {
-            val nicknameRes = firestore.setNickname(nickname)
-            if (nicknameRes.isSuccess) {
-                val res = firebase.registerAccount(email, password)
-                if (res.isFailure){
-                    return@withContext Result.failure(res.exceptionOrNull() ?: Exception("Error"))
+            val uniqCheck = firestore.isUniqueNickname(nickname)
+            if (uniqCheck.isSuccess && !uniqCheck.getOrNull()!!) {
+                return@withContext Result.failure(Exception("Такой никнейм уже занят или он слишком короткий"))
+            }
+            val res = firebase.registerAccount(email, password)
+            if (res.isSuccess) {
+                val nicknameRes = firestore.setNickname(nickname, res.getOrNull())
+                if (nicknameRes.isFailure){
+                    return@withContext Result.failure(res.exceptionOrNull() ?: Exception("Nickname Error"))
                 }
             } else
-                return@withContext Result.failure(nicknameRes.exceptionOrNull() ?: Exception("Error"))
+                return@withContext Result.failure(res.exceptionOrNull() ?: Exception("Error"))
             return@withContext Result.success(Unit)
         }
 

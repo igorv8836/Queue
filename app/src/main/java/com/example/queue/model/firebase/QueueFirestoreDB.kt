@@ -130,7 +130,7 @@ object QueueFirestoreDB {
                                     member.id,
                                     userData["nickname"] as String,
                                     member["isAdmin"] as Boolean,
-                                    getPhotoUrl(userData["photoPath"] as String),
+                                    getPhotoUrl((userData["photoPath"] ?: "") as String),
                                     (member["position"] as Long).toInt()
                                 )
                             }
@@ -173,7 +173,7 @@ object QueueFirestoreDB {
                                         member.id,
                                         userData["nickname"] as String,
                                         member["isAdmin"] as Boolean,
-                                        getPhotoUrl(userData["photoPath"] as String),
+                                        getPhotoUrl((userData["photoPath"] ?: "") as String),
                                         (member["position"] as Long).toInt()
                                     )
                                 }

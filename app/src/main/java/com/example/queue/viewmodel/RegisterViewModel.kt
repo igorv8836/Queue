@@ -16,14 +16,12 @@ class RegisterViewModel : ViewModel() {
 
     fun registerAccount(email: String, password: String, nickname: String) {
         viewModelScope.launch {
-            val res2 = accRepository.addNickname(nickname)
             val res = accRepository.registerAccount(email, password, nickname)
-            if (res.isSuccess && res2.isSuccess) {
+            if (res.isSuccess) {
                 _navigateToBaseFragment.postValue(true)
-            } else if (res.isFailure) {
+            } else {
                 errorText.postValue(res.exceptionOrNull()?.message)
-            } else
-                errorText.postValue(res2.exceptionOrNull()?.message)
+            }
         }
 
     }

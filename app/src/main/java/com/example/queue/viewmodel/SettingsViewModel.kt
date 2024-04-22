@@ -7,24 +7,27 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.queue.model.repositories.AccountRepository
 import com.example.queue.model.repositories.FirestoreRepository
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.io.File
 
 class SettingsViewModel: ViewModel() {
     private val firestoreRep = FirestoreRepository
     private val accRep = AccountRepository
-    private val _helpingText = MutableLiveData<String>()
-    val helpingText: LiveData<String> = _helpingText
-    private val _email = MutableLiveData<String>()
-    val email: LiveData<String> = _email
-    private val _nickname = MutableLiveData<String>()
-    val nickname: LiveData<String> = _nickname
-    private val _image = MutableLiveData<File>()
-    val image: LiveData<File> = _image
-    private val _showAuth = MutableLiveData<Boolean>()
-    val showAuth: LiveData<Boolean> = _showAuth
-    private val _photoFile = MutableLiveData<File>()
-    val photoFile: LiveData<File> = _photoFile
+    private val _helpingText = MutableStateFlow("")
+    val helpingText = _helpingText.asStateFlow()
+    private val _email = MutableStateFlow("")
+    val email = _email.asStateFlow()
+    private val _nickname = MutableStateFlow("")
+    val nickname = _nickname.asStateFlow()
+    private val _image = MutableStateFlow<File?>(null)
+    val image = _image.asStateFlow()
+    private val _showAuth = MutableStateFlow(false)
+    val showAuth = _showAuth.asStateFlow()
+    private val _photoFile = MutableStateFlow<File?>(null)
+    val photoFile = _photoFile.asStateFlow()
 
     init {
         getEmail()
@@ -40,7 +43,7 @@ class SettingsViewModel: ViewModel() {
     private fun getNickname(){
         viewModelScope.launch {
             firestoreRep.getNickname().collect{
-                _nickname.postValue(it)
+                _nickname.value = it
             }
         }
     }
@@ -51,11 +54,9 @@ class SettingsViewModel: ViewModel() {
             if (res.isSuccess){
                 val file = res.getOrNull()
                 if (file != null)
-                    _photoFile.postValue(file)
-                else
-                    _helpingText.postValue("Фотка не загружена")
+                    _photoFile.value = file
             } else{
-                _helpingText.postValue(res.exceptionOrNull()?.message)
+                _helpingText.value = res.exceptionOrNull()?.message ?: ""
             }
         }
     }
@@ -70,8 +71,6 @@ class SettingsViewModel: ViewModel() {
             val res = firestoreRep.setPhoto(photoUri)
             if (res.isSuccess){
                 getPhoto()
-            } else {
-                _helpingText.postValue(res.exceptionOrNull()?.message)
             }
         }
     }
@@ -80,7 +79,7 @@ class SettingsViewModel: ViewModel() {
         viewModelScope.launch {
             val res = firestoreRep.changeNickname(nickname)
             if (res.isFailure)
-                _helpingText.postValue(res.exceptionOrNull()?.message)
+                _helpingText.value = res.exceptionOrNull()?.message ?: ""
         }
     }
 
@@ -88,7 +87,7 @@ class SettingsViewModel: ViewModel() {
         viewModelScope.launch {
             val res = accRep.changePassword(password)
             if (res.isFailure){
-                _helpingText.postValue(res.exceptionOrNull()?.message)
+                _helpingText.value = res.exceptionOrNull()?.message ?: ""
             }
         }
     }

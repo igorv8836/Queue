@@ -1,4 +1,4 @@
-package com.example.queue.ui.fragments
+package com.example.queue.ui.settings_screen
 
 import android.app.Activity
 import android.content.Intent
@@ -10,77 +10,77 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
+import androidx.compose.ui.platform.ComposeView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import com.example.queue.R
 import com.example.queue.databinding.EditTextBinding
-import com.example.queue.databinding.FragmentSettingsBinding
 import com.example.queue.viewmodel.SettingsViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.squareup.picasso.Picasso
 
 class SettingsFragment : Fragment() {
     private val READ_MEDIA_IMAGES_PERMISSION = 1
     private val GALLERY_START_CODE = 2
-    private lateinit var binding: FragmentSettingsBinding
     private lateinit var viewModel: SettingsViewModel
     private lateinit var navController: NavController
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        binding = FragmentSettingsBinding.inflate(inflater, container, false)
+    ): View {
         viewModel = ViewModelProvider(this)[SettingsViewModel::class.java]
         navController = findNavController()
-        return binding.root
+        return ComposeView(requireContext()).apply {
+            setContent {
+                SettingsScreen(viewModel)
+            }
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        with(viewModel){
-            helpingText.observe(viewLifecycleOwner){
-                Toast.makeText(requireContext(), it, Toast.LENGTH_SHORT).show()
-            }
-            email.observe(viewLifecycleOwner){ binding.emailTextview.text = it }
-            nickname.observe(viewLifecycleOwner){ binding.nicknameTextview.text = it }
-            showAuth.observe(viewLifecycleOwner){
-                if (it)
-                    navController.navigate(R.id.authFragment)
-            }
-            photoFile.observe(viewLifecycleOwner){
-                Picasso.get().load(it).resize(
-                    resources.getDimensionPixelSize(R.dimen.user_image_size),
-                    resources.getDimensionPixelSize(R.dimen.user_image_size)
-                ).centerCrop().into(binding.accountImage)
-            }
-        }
-
-        with(binding){
-            signOutButton.setOnClickListener { viewModel.signOut() }
-            accountImage.setOnClickListener { changePhoto() }
-            changeNicknameButton.setOnClickListener {
-                showEditDialog(
-                    title = "Изменение никнейма",
-                    hint = "Введите новый никнейм"
-                ) { newName ->
-                    viewModel.changeNickname(newName)
-                }
-            }
-
-            changePasswordButton.setOnClickListener {
-                showEditDialog(
-                    title = "Изменение пароля",
-                    hint = "Введите новый пароль"
-                ) { newPassword ->
-                    viewModel.changePassword(newPassword)
-                }
-            }
-        }
+//        with(viewModel){
+//            helpingText.observe(viewLifecycleOwner){
+//                Toast.makeText(requireContext(), it, Toast.LENGTH_SHORT).show()
+//            }
+//            email.observe(viewLifecycleOwner){ binding.emailTextview.text = it }
+//            nickname.observe(viewLifecycleOwner){ binding.nicknameTextview.text = it }
+//            showAuth.observe(viewLifecycleOwner){
+//                if (it)
+//                    navController.navigate(R.id.authFragment)
+//            }
+//            photoFile.observe(viewLifecycleOwner){
+//                Picasso.get().load(it).resize(
+//                    resources.getDimensionPixelSize(R.dimen.user_image_size),
+//                    resources.getDimensionPixelSize(R.dimen.user_image_size)
+//                ).centerCrop().into(binding.accountImage)
+//            }
+//        }
+//
+//        with(binding){
+//            signOutButton.setOnClickListener { viewModel.signOut() }
+//            accountImage.setOnClickListener { changePhoto() }
+//            changeNicknameButton.setOnClickListener {
+//                showEditDialog(
+//                    title = "Изменение никнейма",
+//                    hint = "Введите новый никнейм"
+//                ) { newName ->
+//                    viewModel.changeNickname(newName)
+//                }
+//            }
+//
+//            changePasswordButton.setOnClickListener {
+//                showEditDialog(
+//                    title = "Изменение пароля",
+//                    hint = "Введите новый пароль"
+//                ) { newPassword ->
+//                    viewModel.changePassword(newPassword)
+//                }
+//            }
+//        }
     }
 
     private fun changePhoto() {

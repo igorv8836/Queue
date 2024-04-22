@@ -8,7 +8,7 @@ import kotlinx.coroutines.withContext
 object FirebaseAccount {
     private val mAuth: FirebaseAuth = FirebaseAuth.getInstance()
 
-    suspend fun registerAccount(email: String, password: String): Result<Unit> =
+    suspend fun registerAccount(email: String, password: String): Result<String?> =
         withContext(Dispatchers.IO) {
             if (email.isEmpty() || password.isEmpty()) {
                 return@withContext Result.failure(IllegalArgumentException("Все поля должны быть заполнены"))
@@ -17,8 +17,8 @@ object FirebaseAccount {
             }
 
             try {
-                mAuth.createUserWithEmailAndPassword(email, password).await()
-                Result.success(Unit)
+                val res = mAuth.createUserWithEmailAndPassword(email, password).await()
+                Result.success(res.user?.uid)
             } catch (e: Exception) {
                 Result.failure(e)
             }
