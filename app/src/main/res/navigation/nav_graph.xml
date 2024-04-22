@@ -65,7 +65,7 @@
         android:label="fragment_queues" />
     <fragment
         android:id="@+id/queueFragment"
-        android:name="com.example.queue.ui.fragments.QueueFragment"
+        android:name="com.example.queue.ui.queue_screen.QueueFragment"
         android:label="fragment_queue" />
     <fragment
         android:id="@+id/settingsFragment"

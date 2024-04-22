@@ -48,7 +48,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.example.queue.R
 import com.example.queue.ui.components.TopLoadingBar
-import com.example.queue.viewmodels.QueueCreationViewModel
+import com.example.queue.viewmodel.QueueCreationViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.coroutines.launch
 

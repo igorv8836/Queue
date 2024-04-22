@@ -1,0 +1,95 @@
+package com.example.queue.viewmodel
+
+import android.net.Uri
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.queue.model.repositories.AccountRepository
+import com.example.queue.model.repositories.FirestoreRepository
+import kotlinx.coroutines.launch
+import java.io.File
+
+class SettingsViewModel: ViewModel() {
+    private val firestoreRep = FirestoreRepository
+    private val accRep = AccountRepository
+    private val _helpingText = MutableLiveData<String>()
+    val helpingText: LiveData<String> = _helpingText
+    private val _email = MutableLiveData<String>()
+    val email: LiveData<String> = _email
+    private val _nickname = MutableLiveData<String>()
+    val nickname: LiveData<String> = _nickname
+    private val _image = MutableLiveData<File>()
+    val image: LiveData<File> = _image
+    private val _showAuth = MutableLiveData<Boolean>()
+    val showAuth: LiveData<Boolean> = _showAuth
+    private val _photoFile = MutableLiveData<File>()
+    val photoFile: LiveData<File> = _photoFile
+
+    init {
+        getEmail()
+        getNickname()
+        getPhoto()
+    }
+
+    private fun getEmail(){
+        val res = accRep.getEmail()
+        res?.let { _email.value = it }
+    }
+
+    private fun getNickname(){
+        viewModelScope.launch {
+            firestoreRep.getNickname().collect{
+                _nickname.postValue(it)
+            }
+        }
+    }
+
+    private fun getPhoto(){
+        viewModelScope.launch {
+            val res = firestoreRep.getUserImage()
+            if (res.isSuccess){
+                val file = res.getOrNull()
+                if (file != null)
+                    _photoFile.postValue(file)
+                else
+                    _helpingText.postValue("Фотка не загружена")
+            } else{
+                _helpingText.postValue(res.exceptionOrNull()?.message)
+            }
+        }
+    }
+
+    fun signOut(){
+        accRep.signOut()
+        _showAuth.value = true
+    }
+
+    fun changePhoto(photoUri: Uri){
+        viewModelScope.launch {
+            val res = firestoreRep.setPhoto(photoUri)
+            if (res.isSuccess){
+                getPhoto()
+            } else {
+                _helpingText.postValue(res.exceptionOrNull()?.message)
+            }
+        }
+    }
+
+    fun changeNickname(nickname: String){
+        viewModelScope.launch {
+            val res = firestoreRep.changeNickname(nickname)
+            if (res.isFailure)
+                _helpingText.postValue(res.exceptionOrNull()?.message)
+        }
+    }
+
+    fun changePassword(password: String){
+        viewModelScope.launch {
+            val res = accRep.changePassword(password)
+            if (res.isFailure){
+                _helpingText.postValue(res.exceptionOrNull()?.message)
+            }
+        }
+    }
+}

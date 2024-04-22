@@ -7,7 +7,18 @@ data class Queue(
     val id: String? = null,
     val name: String,
     val description: String,
-    val members: List<Member>,
+    var members: List<Member>,
     val isStarted: Boolean,
     val owner: Member
-)
+) {
+    companion object {
+        fun getEmptyQueue() = Queue(
+            "",
+            "",
+            "",
+            emptyList(),
+            false,
+            Member("", "", false, "", 0)
+        )
+    }
+}

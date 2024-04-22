@@ -6,12 +6,11 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavOptions
-import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import com.example.queue.R
 import com.example.queue.databinding.ActivityMainBinding
-import com.example.queue.listeners.ShowBottomMenuListener
-import com.example.queue.viewmodels.MainViewModel
+import com.example.queue.model.listeners.ShowBottomMenuListener
+import com.example.queue.viewmodel.MainViewModel
 import com.google.android.material.navigation.NavigationBarView
 
 class MainActivity : AppCompatActivity(), ShowBottomMenuListener {

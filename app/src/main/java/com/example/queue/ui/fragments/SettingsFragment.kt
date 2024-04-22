@@ -10,8 +10,6 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.EditText
-import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
@@ -20,10 +18,8 @@ import androidx.navigation.fragment.findNavController
 import com.example.queue.R
 import com.example.queue.databinding.EditTextBinding
 import com.example.queue.databinding.FragmentSettingsBinding
-import com.example.queue.viewmodels.SettingsViewModel
+import com.example.queue.viewmodel.SettingsViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.textfield.TextInputEditText
-import com.google.android.material.textfield.TextInputLayout
 import com.squareup.picasso.Picasso
 
 class SettingsFragment : Fragment() {

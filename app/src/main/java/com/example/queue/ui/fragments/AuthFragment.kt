@@ -14,11 +14,8 @@ import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import com.example.queue.R
 import com.example.queue.databinding.FragmentAuthBinding
-import com.example.queue.listeners.ShowBottomMenuListener
-import com.example.queue.viewmodels.AuthViewModel
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.onEach
+import com.example.queue.model.listeners.ShowBottomMenuListener
+import com.example.queue.viewmodel.AuthViewModel
 
 class AuthFragment : Fragment() {
     private var showBottomMenuListener: ShowBottomMenuListener? = null

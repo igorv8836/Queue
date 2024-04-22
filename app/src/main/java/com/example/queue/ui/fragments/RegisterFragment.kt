@@ -12,9 +12,8 @@ import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import com.example.queue.R
 import com.example.queue.databinding.FragmentRegisterBinding
-import com.example.queue.listeners.ShowBottomMenuListener
-import com.example.queue.viewmodels.RegisterViewModel
-import com.google.android.material.snackbar.Snackbar
+import com.example.queue.model.listeners.ShowBottomMenuListener
+import com.example.queue.viewmodel.RegisterViewModel
 
 class RegisterFragment : Fragment() {
     private var showBottomMenuListener: ShowBottomMenuListener? = null
