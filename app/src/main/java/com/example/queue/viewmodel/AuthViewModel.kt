@@ -1,37 +1,33 @@
 package com.example.queue.viewmodel
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.queue.model.repositories.AccountRepository
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
 class AuthViewModel : ViewModel() {
-    private val _navigateToBaseFragment: MutableLiveData<Boolean> = MutableLiveData()
-    val navigateToBaseFragment: LiveData<Boolean> = _navigateToBaseFragment
-    private val _helpingText = MutableLiveData<String>()
-    val helpingText: LiveData<String> = _helpingText
+    private val _navigateToBaseFragment: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    val navigateToBaseFragment = _navigateToBaseFragment
+    private val _helpingText = MutableSharedFlow<String?>(replay = 0, extraBufferCapacity = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
+    val helpingText = _helpingText
     private val accountRepository = AccountRepository
-
-
-    init {
-//        accountRepository.signOut()
-    }
 
 
     fun signIn(email: String, password: String) {
         viewModelScope.launch {
             val res = accountRepository.signInAccount(email, password)
             if (res.isSuccess) {
-                _navigateToBaseFragment.postValue(true)
+                _navigateToBaseFragment.value = true
             } else {
                 val err = when (res.exceptionOrNull()) {
                     is FirebaseAuthInvalidCredentialsException -> "Неверный логин или пароль"
                     else -> res.exceptionOrNull()?.message ?: "Неизвестная ошибка"
                 }
-                _helpingText.postValue(err)
+                _helpingText.emit(err)
             }
         }
     }
@@ -44,7 +40,7 @@ class AuthViewModel : ViewModel() {
             } else {
                 "Критическая ошибка " + res.exceptionOrNull()?.message
             }
-            _helpingText.postValue(message)
+            _helpingText.emit(message)
         }
     }
 }

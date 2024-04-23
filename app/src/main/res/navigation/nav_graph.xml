@@ -23,7 +23,7 @@
 
     <fragment
         android:id="@+id/authFragment"
-        android:name="com.example.queue.ui.fragments.AuthFragment"
+        android:name="com.example.queue.ui.auth_screen.AuthFragment"
         android:label="fragment_auth"
         tools:layout="@layout/fragment_auth" >
         <action
@@ -38,7 +38,7 @@
 
     <fragment
         android:id="@+id/registerFragment"
-        android:name="com.example.queue.ui.fragments.RegisterFragment"
+        android:name="com.example.queue.ui.auth_screen.RegisterFragment"
         android:label="fragment_register"
         tools:layout="@layout/fragment_register" >
         <action

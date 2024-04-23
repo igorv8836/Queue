@@ -10,15 +10,19 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.compose.ui.platform.ComposeView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import com.example.queue.R
 import com.example.queue.databinding.EditTextBinding
 import com.example.queue.viewmodel.SettingsViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import kotlinx.coroutines.launch
 
 class SettingsFragment : Fragment() {
     private val READ_MEDIA_IMAGES_PERMISSION = 1
@@ -42,45 +46,13 @@ class SettingsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-//        with(viewModel){
-//            helpingText.observe(viewLifecycleOwner){
-//                Toast.makeText(requireContext(), it, Toast.LENGTH_SHORT).show()
-//            }
-//            email.observe(viewLifecycleOwner){ binding.emailTextview.text = it }
-//            nickname.observe(viewLifecycleOwner){ binding.nicknameTextview.text = it }
-//            showAuth.observe(viewLifecycleOwner){
-//                if (it)
-//                    navController.navigate(R.id.authFragment)
-//            }
-//            photoFile.observe(viewLifecycleOwner){
-//                Picasso.get().load(it).resize(
-//                    resources.getDimensionPixelSize(R.dimen.user_image_size),
-//                    resources.getDimensionPixelSize(R.dimen.user_image_size)
-//                ).centerCrop().into(binding.accountImage)
-//            }
-//        }
-//
-//        with(binding){
-//            signOutButton.setOnClickListener { viewModel.signOut() }
-//            accountImage.setOnClickListener { changePhoto() }
-//            changeNicknameButton.setOnClickListener {
-//                showEditDialog(
-//                    title = "Изменение никнейма",
-//                    hint = "Введите новый никнейм"
-//                ) { newName ->
-//                    viewModel.changeNickname(newName)
-//                }
-//            }
-//
-//            changePasswordButton.setOnClickListener {
-//                showEditDialog(
-//                    title = "Изменение пароля",
-//                    hint = "Введите новый пароль"
-//                ) { newPassword ->
-//                    viewModel.changePassword(newPassword)
-//                }
-//            }
-//        }
+        lifecycleScope.launch {
+            with(viewModel){
+                helpingText.collect{
+                    Toast.makeText(requireContext(), it, Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
     }
 
     private fun changePhoto() {

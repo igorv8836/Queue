@@ -1,4 +1,4 @@
-package com.example.queue.ui.fragments
+package com.example.queue.ui.auth_screen
 
 import android.app.Activity
 import android.os.Bundle
