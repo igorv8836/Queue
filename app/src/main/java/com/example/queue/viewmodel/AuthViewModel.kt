@@ -12,7 +12,7 @@ import kotlinx.coroutines.launch
 class AuthViewModel : ViewModel() {
     private val _navigateToBaseFragment: MutableStateFlow<Boolean> = MutableStateFlow(false)
     val navigateToBaseFragment = _navigateToBaseFragment
-    private val _helpingText = MutableSharedFlow<String?>(replay = 0, extraBufferCapacity = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
+    private val _helpingText = MutableSharedFlow<String?>()
     val helpingText = _helpingText
     private val accountRepository = AccountRepository
 
@@ -42,5 +42,17 @@ class AuthViewModel : ViewModel() {
             }
             _helpingText.emit(message)
         }
+    }
+
+    fun registerAccount(email: String, password: String, nickname: String) {
+        viewModelScope.launch {
+            val res = accountRepository.registerAccount(email, password, nickname)
+            if (res.isSuccess) {
+                _navigateToBaseFragment.value = true
+            } else {
+                _helpingText.emit(res.exceptionOrNull()?.message)
+            }
+        }
+
     }
 }

@@ -1,4 +1,4 @@
-package com.example.queue.ui.fragments
+package com.example.queue.ui.base_screens
 
 import android.os.Bundle
 import android.view.LayoutInflater

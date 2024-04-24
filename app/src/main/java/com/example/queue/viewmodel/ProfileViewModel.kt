@@ -1,19 +1,16 @@
 package com.example.queue.viewmodel
 
 import android.net.Uri
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.queue.model.repositories.AccountRepository
 import com.example.queue.model.repositories.FirestoreRepository
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.io.File
 
-class SettingsViewModel: ViewModel() {
+class ProfileViewModel: ViewModel() {
     private val firestoreRep = FirestoreRepository
     private val accRep = AccountRepository
     private val _helpingText = MutableStateFlow("")

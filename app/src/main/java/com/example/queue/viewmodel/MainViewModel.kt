@@ -4,10 +4,11 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.queue.model.repositories.AccountRepository
+import kotlinx.coroutines.flow.MutableStateFlow
 
 class MainViewModel: ViewModel() {
-    private val _navigateToBaseFragment: MutableLiveData<Boolean> = MutableLiveData()
-    val navigateToBaseFragment: LiveData<Boolean> = _navigateToBaseFragment
+    private val _navigateToBaseFragment: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    val navigateToBaseFragment = _navigateToBaseFragment
     private val accountRepository = AccountRepository
 
     init {

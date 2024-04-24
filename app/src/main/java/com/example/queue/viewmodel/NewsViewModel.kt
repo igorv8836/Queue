@@ -6,24 +6,23 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.queue.add_classes.NewsItem
 import com.example.queue.model.repositories.FirestoreRepository
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
 class NewsViewModel: ViewModel() {
-    private val _newsData = MutableLiveData<List<NewsItem>>()
-    val newsData: LiveData<List<NewsItem>> = _newsData
-    private val _helpingText = MutableLiveData<String>()
-    val helpingText: LiveData<String> = _helpingText
+    private val _newsData = MutableStateFlow<List<NewsItem>>(emptyList())
+    val newsData = _newsData
     private val repository = FirestoreRepository
+
+    init {
+        loadNews()
+    }
     fun loadNews() {
         viewModelScope.launch {
-            val res = repository.getNews().collect{
+            repository.getNews().collect{
                 _newsData.value = it
             }
-//            if (res.isSuccess){
-//                res.getOrNull()?.let { _newsData.postValue(it) }
-//            } else {
-//                _helpingText.postValue(res.exceptionOrNull()?.message)
-//            }
         }
     }
 

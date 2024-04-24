@@ -1,36 +1,48 @@
 package com.example.queue.ui.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.queue.ui.auth_screen.AuthScreen
+import com.example.queue.ui.auth_screen.RegisterScreen
+import com.example.queue.ui.base_screens.InvitationScreen
+import com.example.queue.ui.base_screens.MainScreen
+import com.example.queue.ui.queue_screen.QueueScreen
 
 @Composable
-fun NavGraph(navHostController: NavHostController){
-    NavHost(navController = navHostController, startDestination = RouteName.AUTH_SCREEN.value){
-        composable(RouteName.AUTH_SCREEN.value){
+fun NavGraph(navHostController: NavHostController) {
+    NavHost(navController = navHostController, startDestination = RouteName.AUTH_SCREEN.value) {
+        composable(RouteName.AUTH_SCREEN.value) {
             AuthScreen(navHostController)
         }
 
-        composable(RouteName.REGISTER_SCREEN.value){
-
+        composable(RouteName.REGISTER_SCREEN.value) {
+            RegisterScreen(navController = navHostController, viewModel = viewModel())
         }
 
-        composable(RouteName.NEWS_SCREEN.value){
-
+        composable(RouteName.MAIN_SCREEN.value,) {
+            val bottomNavController = rememberNavController()
+            MainScreen(navHostController, bottomNavController)
         }
 
-        composable(RouteName.SEARCH_SCREEN.value){
-
+        composable(
+            "${RouteName.QUEUE_SCREEN.value}/{queueId}",
+            arguments = listOf(navArgument("queueId") { type = NavType.StringType })
+        ) {
+            QueueScreen(
+                it.arguments?.getString("queueId"),
+                viewModel = viewModel(),
+                navController = navHostController
+            )
         }
 
-        composable(RouteName.QUEUES_SCREEN.value){
-
-        }
-
-        composable(RouteName.PROFILE_SCREEN.value){
-
+        composable(RouteName.INVITATION_SCREEN.value){
+            InvitationScreen(navController = navHostController)
         }
     }
 }
