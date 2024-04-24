@@ -1,9 +1,5 @@
 package com.example.queue.ui.base_screens
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.animateContentSize
@@ -24,6 +20,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -39,98 +36,78 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
 import com.example.queue.R
 import com.example.queue.ui.components.TopLoadingBar
-import com.example.queue.viewmodel.QueueCreationViewModel
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import kotlinx.coroutines.launch
-
-class CreationQueueFragment : BottomSheetDialogFragment() {
-    private val viewModel: QueueCreationViewModel by viewModels()
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.creationComplete.collect{
-                if(it){
-                    dismiss()
-                }
-            }
-        }
-    }
-
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        return ComposeView(requireContext()).apply {
-            setContent {
-                MaterialTheme {
-                    QueueCreationScreen(viewModel) { dismiss() }
-                }
-            }
-        }
-    }
-}
+import com.example.queue.viewmodel.QueuesViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun QueueCreationScreen(viewModel: QueueCreationViewModel, onExitClicked: () -> Unit) {
+fun QueueCreationBottomSheet(viewModel: QueuesViewModel, onExitClicked: () -> Unit) {
     var queueName by rememberSaveable { mutableStateOf("") }
     var description by rememberSaveable { mutableStateOf("") }
     val isLoading = viewModel.showLoading.collectAsState()
-    Scaffold(topBar = {
-        TopAppBar(
-            title = { Text(text = "Создание очереди", style = MaterialTheme.typography.titleLarge) },
-            navigationIcon = {
-                IconButton(onClick = onExitClicked) {
-                    Icon(
-                        imageVector = ImageVector.vectorResource(id = R.drawable.arrow_back),
-                        contentDescription = "Back"
-                    )
-                }
-            },
-            actions = {
-                IconButton(onClick = {
-                    viewModel.createQueue(queueName, description)
-                }) {
-                    Icon(painter = painterResource(id = R.drawable.check), contentDescription = "Save")
-                }
-            }
-        )
-    }, modifier = Modifier.wrapContentHeight()) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .padding(paddingValues)
-                .fillMaxWidth()
-        ) {
-            TopLoadingBar(isLoading = isLoading.value)
-            MyTextField(hint = "Название очереди", dataText = queueName){ queueName = it }
-            MyTextField(hint = "Описание", dataText = description, lines = 5){ description = it }
 
-            Row(
+    ModalBottomSheet(onDismissRequest = onExitClicked) {
+        Scaffold(topBar = {
+            TopAppBar(
+                title = {
+                    Text(
+                        text = "Создание очереди",
+                        style = MaterialTheme.typography.titleLarge
+                    )
+                },
+                navigationIcon = {
+                    IconButton(onClick = onExitClicked) {
+                        Icon(
+                            imageVector = ImageVector.vectorResource(id = R.drawable.arrow_back),
+                            contentDescription = "Back"
+                        )
+                    }
+                },
+                actions = {
+                    IconButton(onClick = {
+                        viewModel.createQueue(queueName, description)
+                    }) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.check),
+                            contentDescription = "Save"
+                        )
+                    }
+                }
+            )
+        }, modifier = Modifier.wrapContentHeight()) { paddingValues ->
+            Column(
                 modifier = Modifier
+                    .padding(paddingValues)
                     .fillMaxWidth()
-                    .width(300.dp),
-                horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                QueueStatus("Закрытая", "Открытая", viewModel::changeQueueClosed)
-                QueueStatus("Одноразовая", "Циклическая", viewModel::changeQueueSingleEvent)
+                TopLoadingBar(isLoading = isLoading.value)
+                MyTextField(hint = "Название очереди", dataText = queueName) { queueName = it }
+                MyTextField(hint = "Описание", dataText = description, lines = 5) {
+                    description = it
+                }
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .width(300.dp),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    QueueStatus("Закрытая", "Открытая", viewModel::changeQueueClosed)
+                    QueueStatus("Одноразовая", "Циклическая", viewModel::changeQueueSingleEvent)
+                }
             }
         }
     }
+
+
 }
 
 @Composable
-fun MyTextField(hint: String, dataText: String, lines: Int = 1, onTextChange: (String) -> Unit){
+fun MyTextField(hint: String, dataText: String, lines: Int = 1, onTextChange: (String) -> Unit) {
     val interactionSource = remember { MutableInteractionSource() }
     val isTextFieldFocused by interactionSource.collectIsFocusedAsState()
 
@@ -161,7 +138,7 @@ fun MyTextField(hint: String, dataText: String, lines: Int = 1, onTextChange: (S
 }
 
 @Composable
-fun QueueStatus(ableText: String, unableText: String, updateStatus: (Boolean) -> Unit){
+fun QueueStatus(ableText: String, unableText: String, updateStatus: (Boolean) -> Unit) {
     val isAble = rememberSaveable() { mutableStateOf(true) }
     val surfaceColor by animateColorAsState(
         if (!isAble.value) Color.Green else MaterialTheme.colorScheme.error,
@@ -178,19 +155,11 @@ fun QueueStatus(ableText: String, unableText: String, updateStatus: (Boolean) ->
                 isAble.value = !isAble.value
                 updateStatus(isAble.value)
             }
-    ){
+    ) {
         Text(
             text = if (isAble.value) ableText else unableText,
             style = MaterialTheme.typography.bodyMedium,
             modifier = Modifier.padding(8.dp)
         )
-    }
-}
-
-@Preview
-@Composable
-fun PreviewMyTopAppBar() {
-    MaterialTheme {
-        QueueCreationScreen(QueueCreationViewModel()) {}
     }
 }

@@ -30,4 +30,10 @@ object QueueRepository {
 
     suspend fun changePosition(queueId: String, id: String, to: Int) =
         firestore.changePosition(queueId, id, to)
+
+    suspend fun getInvitations() = firestore.getInvitations()
+
+    suspend fun applyInvitation(queueId: String) = firestore.applyInvitation(queueId)
+
+    suspend fun declineInvitation(queueId: String) = firestore.declineInvitation(queueId)
 }

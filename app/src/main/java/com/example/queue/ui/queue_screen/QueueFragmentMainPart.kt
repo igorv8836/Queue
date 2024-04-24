@@ -50,7 +50,7 @@ fun QueueFragmentMainPart(viewModel: QueueViewModel) {
             .fillMaxWidth()
     ) {
         Text(
-            text = queue?.name ?: "",
+            text = queue.name,
             style = MaterialTheme.typography.titleLarge,
             modifier = Modifier
                 .fillMaxWidth()
@@ -60,7 +60,7 @@ fun QueueFragmentMainPart(viewModel: QueueViewModel) {
             overflow = TextOverflow.Ellipsis
         )
 
-        Text(text = queue?.members?.size?.let { getCountText(it) } ?: "",
+        Text(text = queue.members.size?.let { getCountText(it) } ?: "",
             style = MaterialTheme.typography.bodySmall,
             modifier = Modifier
                 .align(Alignment.CenterHorizontally)
@@ -82,7 +82,7 @@ fun QueueFragmentMainPart(viewModel: QueueViewModel) {
                         .padding(start = 8.dp, top = 8.dp),
                 )
                 Text(
-                    text = queue?.description ?: "",
+                    text = queue.description,
                     style = MaterialTheme.typography.bodyMedium,
                     modifier = Modifier
                         .fillMaxWidth()
@@ -97,7 +97,7 @@ fun QueueFragmentMainPart(viewModel: QueueViewModel) {
                         .padding(top = 4.dp, start = 8.dp),
                 )
                 Text(
-                    text = queue?.owner?.name ?: "",
+                    text = queue.owner.name,
                     style = MaterialTheme.typography.bodyMedium,
                     modifier = Modifier
                         .fillMaxWidth()
@@ -110,13 +110,13 @@ fun QueueFragmentMainPart(viewModel: QueueViewModel) {
         Row(
             modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            val isAbled = (userId == queue?.owner?.id && userId != null)
-            ManagingButton(iconResource = if (queue?.isStarted == true) R.drawable.start_icon
+            val isAbled = (userId == queue.owner.id && userId != null)
+            ManagingButton(iconResource = if (queue.isStarted) R.drawable.start_icon
             else R.drawable.stop_icon,
-                text = if (queue?.isStarted == true) "Запустить"
+                text = if (queue.isStarted) "Запустить"
                 else "Остановить",
                 isAbled = isAbled,
-                color = if (queue?.isStarted == true) MaterialTheme.colorScheme.primary
+                color = if (queue.isStarted) MaterialTheme.colorScheme.primary
                 else Color.Red,
                 onClick = { viewModel.startQueue() })
             ManagingButton(iconResource = R.drawable.restart_icon,

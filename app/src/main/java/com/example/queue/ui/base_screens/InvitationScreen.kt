@@ -1,8 +1,8 @@
 package com.example.queue.ui.base_screens
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -20,24 +20,23 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-
-
-data class Invitation(
-    val queueName: String,
-    val peopleCount: Int,
-    val author: String
-)
+import com.example.queue.add_classes.Invitation
+import com.example.queue.viewmodel.ProfileViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun InvitationScreen(navController: NavController) {
+fun InvitationScreen(navController: NavController, viewModel: ProfileViewModel) {
+    viewModel.getInvitations()
+    val invitations by viewModel.invitations.collectAsState()
     Scaffold(
         topBar = {
             TopAppBar(
@@ -50,27 +49,16 @@ fun InvitationScreen(navController: NavController) {
             )
         }
     ) {
-        InvitationList(
-            invitations = listOf(
-                Invitation("Очередь в стоматологию", 5, "Алексей"),
-                Invitation("Очередь в кафе", 3, "Мария"),
-                Invitation("Очередь на мойку", 4, "Иван")
-            )
-        )
-    }
-}
-
-@Composable
-fun InvitationList(invitations: List<Invitation>) {
-    LazyColumn {
-        items(invitations) { invitation ->
-            InvitationItem(invitation)
+        LazyColumn(modifier = Modifier.padding(it)) {
+            items(invitations) { invitation ->
+                InvitationItem(invitation, viewModel)
+            }
         }
     }
 }
 
 @Composable
-fun InvitationItem(invitation: Invitation) {
+fun InvitationItem(invitation: Invitation, viewModel: ProfileViewModel) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -94,16 +82,15 @@ fun InvitationItem(invitation: Invitation) {
                 horizontalArrangement = Arrangement.End,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Button(
-                    onClick = { /* Handle decline */ },
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
+                TextButton(
+                    onClick = { viewModel.declineInvitation(invitation.id) },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent, contentColor = Color.Red),
                     modifier = Modifier.padding(end = 8.dp)
                 ) {
                     Text("Отклонить")
                 }
-                Button(
-                    onClick = { /* Handle accept */ },
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.Green)
+                TextButton(
+                    onClick = { viewModel.applyInvitation(invitation.id) },
                 ) {
                     Text("Принять")
                 }

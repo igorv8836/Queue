@@ -42,7 +42,7 @@ fun NavGraph(navHostController: NavHostController) {
         }
 
         composable(RouteName.INVITATION_SCREEN.value){
-            InvitationScreen(navController = navHostController)
+            InvitationScreen(navController = navHostController, viewModel())
         }
     }
 }

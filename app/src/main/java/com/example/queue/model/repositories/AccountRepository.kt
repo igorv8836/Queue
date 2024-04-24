@@ -26,9 +26,6 @@ object AccountRepository {
             return@withContext Result.success(Unit)
         }
 
-
-    suspend fun addNickname(nickname: String) = firestore.setNickname(nickname)
-
     suspend fun signInAccount(email: String, password: String) =
         firebase.signInAccount(email, password)
 

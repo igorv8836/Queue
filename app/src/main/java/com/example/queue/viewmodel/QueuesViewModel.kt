@@ -7,6 +7,7 @@ import com.example.queue.model.repositories.QueueRepository
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
@@ -18,6 +19,12 @@ open class QueuesViewModel: ViewModel() {
     open val queues = _queues.asStateFlow()
     private val _myQueues = MutableStateFlow<List<Queue>>(emptyList())
     open val myQueues = _myQueues.asStateFlow()
+
+    val creationComplete = MutableStateFlow(false)
+    private val _showLoading = MutableStateFlow(false)
+    val showLoading: StateFlow<Boolean> = _showLoading
+    private var _isQueueClosed = MutableStateFlow(true)
+    private var _isQueueSingleEvent = MutableStateFlow(true)
 
     init {
         getErrorFlow()
@@ -37,6 +44,28 @@ open class QueuesViewModel: ViewModel() {
             repository.getQueues().collect{
                 _myQueues.value = it.first
                 _queues.value = it.second
+            }
+        }
+    }
+
+    fun changeQueueClosed(isClosed: Boolean) {
+        _isQueueClosed.value = isClosed
+    }
+
+    fun changeQueueSingleEvent(isSingleEvent: Boolean) {
+        _isQueueSingleEvent.value = isSingleEvent
+    }
+
+    fun createQueue(title: String, description: String) {
+        _showLoading.value = true
+        viewModelScope.launch {
+            val res = repository.createQueue(title, description, _isQueueClosed.value)
+            if (res.isSuccess) {
+                _showLoading.value = false
+                creationComplete.value = true
+            } else {
+                _showLoading.value = false
+                creationComplete.value = true
             }
         }
     }

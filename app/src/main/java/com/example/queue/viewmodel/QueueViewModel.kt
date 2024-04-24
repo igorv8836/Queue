@@ -23,6 +23,7 @@ class QueueViewModel : ViewModel() {
 
     init {
         checkError()
+        getCurrentUser()
     }
 
     fun getQueue(id: String) {
@@ -42,7 +43,7 @@ class QueueViewModel : ViewModel() {
         }
     }
 
-    fun getCurrentUser() {
+    private fun getCurrentUser() {
         _userId.value = queueRepository.getCurrentUser()
     }
 
@@ -61,7 +62,7 @@ class QueueViewModel : ViewModel() {
 
     fun exitFromQueue() {
         viewModelScope.launch {
-            val res = queue.value?.id?.let { queueRepository.exitFromQueue(it) }
+            val res = queue.value.id?.let { queueRepository.exitFromQueue(it) }
             if (res?.isSuccess == true) {
                 _isDeleted.value = res.getOrNull() ?: false
             }

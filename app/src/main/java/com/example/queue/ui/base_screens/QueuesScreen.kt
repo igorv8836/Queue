@@ -1,5 +1,6 @@
 package com.example.queue.ui.base_screens
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -20,8 +21,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 import com.example.queue.ui.components.QueueItemCard
@@ -34,6 +37,7 @@ import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
 import kotlinx.coroutines.launch
 
+@SuppressLint("CoroutineCreationDuringComposition")
 @OptIn(ExperimentalPagerApi::class)
 @Composable
 fun QueuesScreen(
@@ -48,11 +52,26 @@ fun QueuesScreen(
     val queues by viewModel.queues.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
 
+    var showCreationSheet by remember { mutableStateOf(false) }
+
+    coroutineScope.launch {
+        viewModel.creationComplete.collect{
+            if (it)
+                showCreationSheet = false
+        }
+    }
+
+    if (showCreationSheet){
+        QueueCreationBottomSheet(viewModel = viewModel) {
+            showCreationSheet = false
+        }
+    }
+
     Column(modifier = Modifier.fillMaxSize()) {
         Scaffold(
             floatingActionButton = {
                 FloatingActionButton(onClick = {
-                    TODO()
+                    showCreationSheet = true
                 }) {
                     Icon(imageVector = Icons.Filled.Add, contentDescription = "Add Queue")
                 }
