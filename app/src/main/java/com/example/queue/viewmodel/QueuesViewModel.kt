@@ -8,13 +8,14 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 open class QueuesViewModel: ViewModel() {
     private val repository = QueueRepository
     private val _errorText = MutableSharedFlow<String>()
-    val errorText: SharedFlow<String> = _errorText
+    val errorText: SharedFlow<String> = _errorText.asSharedFlow()
     private val _queues = MutableStateFlow<List<Queue>>(emptyList())
     open val queues = _queues.asStateFlow()
     private val _myQueues = MutableStateFlow<List<Queue>>(emptyList())
@@ -22,7 +23,7 @@ open class QueuesViewModel: ViewModel() {
 
     val creationComplete = MutableStateFlow(false)
     private val _showLoading = MutableStateFlow(false)
-    val showLoading: StateFlow<Boolean> = _showLoading
+    val showLoading = _showLoading.asStateFlow()
     private var _isQueueClosed = MutableStateFlow(true)
     private var _isQueueSingleEvent = MutableStateFlow(true)
 

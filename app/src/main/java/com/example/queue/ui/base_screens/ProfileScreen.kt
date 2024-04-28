@@ -17,10 +17,16 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -34,6 +40,7 @@ import com.bumptech.glide.integration.compose.GlideImage
 import com.example.queue.ui.Dimens
 import com.example.queue.ui.navigation.RouteName
 import com.example.queue.viewmodel.ProfileViewModel
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
@@ -42,6 +49,14 @@ fun SettingsScreen(viewModel: ProfileViewModel, navController: NavController) {
     val nickname = viewModel.nickname.collectAsState()
     val photoFile = viewModel.photoFile.collectAsState()
     val helpingText = viewModel.helpingText.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val coroutineScope = rememberCoroutineScope()
+
+    LaunchedEffect(helpingText.value) {
+        coroutineScope.launch {
+            snackbarHostState.showSnackbar(helpingText.value)
+        }
+    }
 
     val pickImageLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent(),
@@ -59,85 +74,90 @@ fun SettingsScreen(viewModel: ProfileViewModel, navController: NavController) {
         }
     )
 
-
-    Column(
+    Scaffold(
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         modifier = Modifier
             .padding(start = Dimens.small, end = Dimens.small, top = Dimens.small)
-            .fillMaxSize()
     ) {
-        GlideImage(
-            model = photoFile.value?.toURI().toString(),
-            contentDescription = "user photo",
-            contentScale = ContentScale.Crop,
+        Column(
             modifier = Modifier
-                .size(160.dp)
-                .clip(CircleShape)
-                .align(Alignment.CenterHorizontally)
-                .background(color = Color.Gray, shape = CircleShape)
-                .clickable {
-                    permissionLauncher.launch(
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                            android.Manifest.permission.READ_MEDIA_IMAGES
-                        } else {
-                            android.Manifest.permission.READ_EXTERNAL_STORAGE
-                        }
-                    )
-                }
-        )
-
-        Text(
-            text = nickname.value,
-            style = MaterialTheme.typography.titleLarge,
-            textAlign = TextAlign.Center,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = Dimens.small)
-        )
-        Text(
-            text = email.value,
-            style = MaterialTheme.typography.bodyLarge,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.fillMaxWidth()
-        )
-        Button(
-            onClick = {
-                viewModel.signOut()
-                navController.navigate(RouteName.AUTH_SCREEN.value) {
-                    popUpTo(navController.graph.startDestinationId) {
-                        inclusive = true
+                .padding(it)
+                .fillMaxSize()
+        ) {
+            GlideImage(
+                model = photoFile.value?.toURI().toString(),
+                contentDescription = "user photo",
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .size(160.dp)
+                    .clip(CircleShape)
+                    .align(Alignment.CenterHorizontally)
+                    .background(color = Color.Gray, shape = CircleShape)
+                    .clickable {
+                        permissionLauncher.launch(
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                                android.Manifest.permission.READ_MEDIA_IMAGES
+                            } else {
+                                android.Manifest.permission.READ_EXTERNAL_STORAGE
+                            }
+                        )
                     }
-                }
-            },
-            modifier = Modifier
-                .align(Alignment.CenterHorizontally)
-                .padding(vertical = Dimens.small),
-            colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
-        ) {
-            Text("Выйти")
-        }
+            )
 
-        Surface(
-            shape = RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp),
-            shadowElevation = 4.dp,
-            modifier = Modifier.fillMaxSize()
-        ) {
-            Column(
-                modifier = Modifier.padding(Dimens.small)
+            Text(
+                text = nickname.value,
+                style = MaterialTheme.typography.titleLarge,
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = Dimens.small)
+            )
+            Text(
+                text = email.value,
+                style = MaterialTheme.typography.bodyLarge,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth()
+            )
+            Button(
+                onClick = {
+                    viewModel.signOut()
+                    navController.navigate(RouteName.AUTH_SCREEN.value) {
+                        popUpTo(navController.graph.startDestinationId) {
+                            inclusive = true
+                        }
+                    }
+                },
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .padding(vertical = Dimens.small),
+                colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
             ) {
-                SectionTitle(title = "Профиль")
-                SettingsItem("Приглашения"){
-                    navController.navigate(RouteName.INVITATION_SCREEN.value)
-                }
-                SectionTitle(title = "Настройки аккаунта")
-                SettingsItem("Изменить никнейм")
-                SettingsItem("Изменить пароль")
-                SectionTitle(title = "Общие настройки")
-                SettingsItem("Настройки")
+                Text("Выйти")
             }
 
-        }
+            Surface(
+                shape = RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp),
+                shadowElevation = 4.dp,
+                modifier = Modifier.fillMaxSize()
+            ) {
+                Column(
+                    modifier = Modifier.padding(Dimens.small)
+                ) {
+                    SectionTitle(title = "Профиль")
+                    SettingsItem("Приглашения") {
+                        navController.navigate(RouteName.INVITATION_SCREEN.value)
+                    }
+                    SectionTitle(title = "Настройки аккаунта")
+                    SettingsItem("Изменить никнейм")
+                    SettingsItem("Изменить пароль")
+                    SectionTitle(title = "Общие настройки")
+                    SettingsItem("Настройки")
+                }
 
+            }
+        }
     }
+
 }
 
 @Composable

@@ -9,7 +9,7 @@ import androidx.compose.ui.graphics.Color
 import com.example.queue.viewmodel.QueueViewModel
 
 @Composable
-fun UserDeletingDialog(viewModel: QueueViewModel, showDeletingDialog: MutableState<Boolean>) {
+fun UserDeletingDialog(viewModel: QueueViewModel, showDeletingDialog: MutableState<Boolean>, userId: String) {
     if (showDeletingDialog.value) {
         AlertDialog(title = { Text(text = "Подтвердите удаление") },
             text = { Text(text = "Вы действительно хотите участника с очереди?") },
@@ -17,7 +17,7 @@ fun UserDeletingDialog(viewModel: QueueViewModel, showDeletingDialog: MutableSta
             confirmButton = {
                 TextButton(onClick = {
                     showDeletingDialog.value = false
-//                    TODO()
+                    viewModel.deleteUser(userId)
                 }) {
                     Text(text = "Удалить", color = Color.Red)
                 }

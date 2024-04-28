@@ -1,5 +1,6 @@
 package com.example.queue.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.queue.add_classes.Member
@@ -21,6 +22,8 @@ class QueueViewModel : ViewModel() {
     private val _helpingText = MutableStateFlow<String?>(null)
     val helpingText = _helpingText.asStateFlow()
 
+    private var startIndex: Int? = null
+
     init {
         checkError()
         getCurrentUser()
@@ -30,6 +33,7 @@ class QueueViewModel : ViewModel() {
         viewModelScope.launch {
             queueRepository.getQueue(id).collect {
                 _queue.value = it ?: Queue.getEmptyQueue()
+                Log.i("tag", it?.owner?.isActive.toString() + "fd")
             }
         }
 
@@ -67,11 +71,24 @@ class QueueViewModel : ViewModel() {
                 _isDeleted.value = res.getOrNull() ?: false
             }
         }
-
     }
 
-    fun restartQueue() {
+     fun deleteUser(id: String){
+         viewModelScope.launch {
+            val res = queueRepository.exitFromQueue(id)
+        }
+     }
 
+    fun restartQueue() {
+        viewModelScope.launch {
+            queue.value.id?.let { queueRepository.restartQueue(it) }
+        }
+    }
+
+    fun competeActionInQueue(userId: String) {
+        viewModelScope.launch {
+            queue.value.id?.let { queueRepository.completeActionInQueue(it, userId) }
+        }
     }
 
     fun startQueue() {
@@ -94,7 +111,10 @@ class QueueViewModel : ViewModel() {
 
     fun moveMember(fromIndex: Int, toIndex: Int) {
         viewModelScope.launch {
-            if (fromIndex < toIndex) {
+            if (startIndex == null)
+                startIndex = fromIndex
+
+            if (fromIndex <= toIndex || (userId.value == queue.value.owner.id)) {
                 val mutableMembers = _queue.value.members.toMutableList()
                 mutableMembers.add(toIndex, mutableMembers.removeAt(fromIndex))
                 _queue.value = _queue.value.copy(members = mutableMembers)
@@ -104,9 +124,10 @@ class QueueViewModel : ViewModel() {
 
     fun endMoving(fromIndex: Int, toIndex: Int) {
         viewModelScope.launch {
+            startIndex = null
             queueRepository.changePosition(
                 queue.value.id ?: "",
-                queue.value.members[fromIndex].id,
+                queue.value.members[toIndex].id,
                 toIndex
             )
         }

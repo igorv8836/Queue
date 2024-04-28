@@ -25,22 +25,23 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.example.queue.R
 import com.example.queue.viewmodel.QueueViewModel
 
 @Composable
-fun QueueFragmentMainPart(viewModel: QueueViewModel) {
+fun QueueFragmentMainPart(viewModel: QueueViewModel, navController: NavController) {
     val queue by viewModel.queue.collectAsState()
     val userId by viewModel.userId.collectAsState()
     val showDeletingDialog = remember { mutableStateOf(false) }
     val showExitingDialog = remember { mutableStateOf(false) }
 
     if (showDeletingDialog.value) {
-        DeletingAlertDialog(viewModel, showDeletingDialog)
+        DeletingAlertDialog(viewModel, showDeletingDialog, navController)
     }
 
     if (showExitingDialog.value) {
-        ExitingAlertDialog(viewModel, showExitingDialog)
+        ExitingAlertDialog(viewModel, showExitingDialog, navController)
     }
 
     Column(
@@ -111,18 +112,18 @@ fun QueueFragmentMainPart(viewModel: QueueViewModel) {
             modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween
         ) {
             val isAbled = (userId == queue.owner.id && userId != null)
-            ManagingButton(iconResource = if (queue.isStarted) R.drawable.start_icon
+            ManagingButton(iconResource = if (!queue.isStarted) R.drawable.start_icon
             else R.drawable.stop_icon,
-                text = if (queue.isStarted) "Запустить"
+                text = if (!queue.isStarted) "Запустить"
                 else "Остановить",
                 isAbled = isAbled,
-                color = if (queue.isStarted) MaterialTheme.colorScheme.primary
+                color = if (!queue.isStarted) MaterialTheme.colorScheme.primary
                 else Color.Red,
                 onClick = { viewModel.startQueue() })
             ManagingButton(iconResource = R.drawable.restart_icon,
                 text = "Перезапустить",
                 isAbled = isAbled,
-                onClick = {})
+                onClick = { viewModel.restartQueue() })
             ManagingButton(iconResource = R.drawable.exit_icon,
                 text = "Покинуть",
                 isAbled = !isAbled,
@@ -136,7 +137,11 @@ fun QueueFragmentMainPart(viewModel: QueueViewModel) {
 }
 
 @Composable
-fun DeletingAlertDialog(viewModel: QueueViewModel, showDeletingDialog: MutableState<Boolean>) {
+fun DeletingAlertDialog(
+    viewModel: QueueViewModel,
+    showDeletingDialog: MutableState<Boolean>,
+    navController: NavController
+) {
     AlertDialog(title = { Text(text = "Подтвердите удаление") },
         text = { Text(text = "Вы действительно хотите удалить очередь?") },
         onDismissRequest = { showDeletingDialog.value = false },
@@ -144,6 +149,7 @@ fun DeletingAlertDialog(viewModel: QueueViewModel, showDeletingDialog: MutableSt
             TextButton(onClick = {
                 viewModel.deleteQueue()
                 showDeletingDialog.value = false
+                navController.popBackStack()
             }) {
                 Text(text = "Удалить", color = Color.Red)
             }
@@ -156,7 +162,11 @@ fun DeletingAlertDialog(viewModel: QueueViewModel, showDeletingDialog: MutableSt
 }
 
 @Composable
-fun ExitingAlertDialog(viewModel: QueueViewModel, showExitingDialog: MutableState<Boolean>) {
+fun ExitingAlertDialog(
+    viewModel: QueueViewModel,
+    showExitingDialog: MutableState<Boolean>,
+    navController: NavController
+) {
     AlertDialog(title = { Text(text = "Подтвердите выход") },
         text = { Text(text = "Вы действительно хотите выйти из очереди?") },
         onDismissRequest = { showExitingDialog.value = false },
@@ -164,6 +174,7 @@ fun ExitingAlertDialog(viewModel: QueueViewModel, showExitingDialog: MutableStat
             TextButton(onClick = {
                 viewModel.exitFromQueue()
                 showExitingDialog.value = false
+                navController.popBackStack()
             }) {
                 Text(text = "Выйти", color = Color.Red)
             }

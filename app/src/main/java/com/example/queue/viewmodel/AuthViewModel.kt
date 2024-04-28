@@ -7,13 +7,15 @@ import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class AuthViewModel : ViewModel() {
     private val _navigateToBaseFragment: MutableStateFlow<Boolean> = MutableStateFlow(false)
-    val navigateToBaseFragment = _navigateToBaseFragment
+    val navigateToBaseFragment = _navigateToBaseFragment.asStateFlow()
     private val _helpingText = MutableSharedFlow<String?>()
-    val helpingText = _helpingText
+    val helpingText = _helpingText.asSharedFlow()
     private val accountRepository = AccountRepository
 
 

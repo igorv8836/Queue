@@ -36,4 +36,9 @@ object QueueRepository {
     suspend fun applyInvitation(queueId: String) = firestore.applyInvitation(queueId)
 
     suspend fun declineInvitation(queueId: String) = firestore.declineInvitation(queueId)
+
+    suspend fun restartQueue(queueId: String) = firestore.cleanCompleteUsers(queueId)
+
+    suspend fun completeActionInQueue(queueId: String, userId: String) =
+        firestore.completeActionInQueue(queueId, userId)
 }

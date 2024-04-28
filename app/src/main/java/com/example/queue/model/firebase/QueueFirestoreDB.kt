@@ -42,14 +42,19 @@ object QueueFirestoreDB {
     suspend fun getInvitations() = withContext(Dispatchers.IO) {
         try {
             currUser?.uid?.let { userId ->
-                val queueRef = firebaseFirestore.collection("queues").whereArrayContains("invitations", userId)
+                val queueRef =
+                    firebaseFirestore.collection("queues").whereArrayContains("invitations", userId)
                 val list = queueRef.get().await().documents.mapNotNull { doc ->
-                    val ownerId = doc.getString("owner") ?: throw IllegalStateException("Document has no owner")
-                    val ownerDoc = firebaseFirestore.collection("users").document(ownerId).get().await()
-                    val name = doc.getString("name") ?: throw IllegalStateException("Document has no name")
+                    val ownerId = doc.getString("owner")
+                        ?: throw IllegalStateException("Document has no owner")
+                    val ownerDoc =
+                        firebaseFirestore.collection("users").document(ownerId).get().await()
+                    val name =
+                        doc.getString("name") ?: throw IllegalStateException("Document has no name")
                     val members = doc.get("members") as? List<*>
                         ?: throw IllegalStateException("Members data is not available")
-                    val nickname = ownerDoc.getString("nickname") ?: throw IllegalStateException("Owner has no nickname")
+                    val nickname = ownerDoc.getString("nickname")
+                        ?: throw IllegalStateException("Owner has no nickname")
 
                     Invitation(doc.id, name, members.size, nickname)
                 }
@@ -137,6 +142,36 @@ object QueueFirestoreDB {
             }
         }
 
+    suspend fun completeActionInQueue(queueId: String, userId: String){
+        withContext(Dispatchers.IO){
+            try {
+                firebaseFirestore.collection("queues")
+                    .document(queueId).update("completeUsers", FieldValue.arrayUnion(userId))
+                    .addOnCompleteListener {
+                        if (!it.isSuccessful)
+                            emitError(it.exception ?: Exception("Неизвестная ошибка"))
+                    }
+            } catch (e: Exception) {
+                emitError(e)
+            }
+        }
+    }
+
+    suspend fun cleanCompleteUsers(queueId: String){
+        withContext(Dispatchers.IO){
+            try {
+                firebaseFirestore.collection("queues")
+                    .document(queueId).update("completeUsers", FieldValue.delete())
+                    .addOnCompleteListener {
+                        if (!it.isSuccessful)
+                            emitError(it.exception ?: Exception("Неизвестная ошибка"))
+                    }
+            } catch (e: Exception) {
+                emitError(e)
+            }
+        }
+    }
+
     suspend fun getQueue(id: String) = channelFlow<Queue?> {
         val listener = firebaseFirestore.collection("queues").document(id)
             .addSnapshotListener { snapshot, error ->
@@ -145,32 +180,39 @@ object QueueFirestoreDB {
                     return@addSnapshotListener
                 }
                 launch {
-                    val queue = snapshot?.let {
-                        val members = (snapshot.get("members") as List<String>).mapIndexed{ index, member ->
-                            val userData = firebaseFirestore.collection("users")
-                                .document(member).get().await()
-                            Member(
-                                member,
-                                userData["nickname"] as String,
-                                it.getString("owner") == member,
-                                getPhotoUrl((userData["photoPath"] ?: "") as String),
-                                index
+                    try {
+                        val inactiveUsers = (snapshot?.get("completeUsers") as? List<String>) ?: emptyList()
+                        val queue = snapshot?.let {
+                            val members =
+                                (snapshot.get("members") as List<String>).mapIndexed { index, member ->
+                                    val userData = firebaseFirestore.collection("users")
+                                        .document(member).get().await()
+                                    Member(
+                                        member,
+                                        userData["nickname"] as String,
+                                        it.getString("owner") == member,
+                                        getPhotoUrl((userData["photoPath"] ?: "") as String),
+                                        !inactiveUsers.contains(member)
+                                    )
+                                }.sortedByDescending { it.isActive }
+                            val creator = if (members.isEmpty())
+                                Member("", "", false, "", true)
+                            else
+                                members.first { it.id == snapshot["owner"] }
+                            Queue(
+                                snapshot.id,
+                                snapshot["name"] as String,
+                                snapshot["description"] as String,
+                                members,
+                                snapshot["isStarted"] as Boolean,
+                                creator,
+                                inactiveUsers
                             )
                         }
-                        val creator = if (members.isEmpty())
-                            Member("", "", false, "", 0)
-                        else
-                            members.first { it.id == snapshot["owner"] }
-                        Queue(
-                            snapshot.id,
-                            snapshot["name"] as String,
-                            snapshot["description"] as String,
-                            members,
-                            snapshot["isStarted"] as Boolean,
-                            creator
-                        )
+                        trySend(queue)
+                    } catch (e: Exception) {
+                        _errorFlow.tryEmit(e)
                     }
-                    trySend(queue)
                 }
             }
         awaitClose { listener.remove() }
@@ -187,20 +229,22 @@ object QueueFirestoreDB {
 
                 launch {
                     val queues = snapshot?.documents?.map { queue ->
+                        val inactiveUsers = (queue.get("completeUsers") as? List<String>) ?: emptyList()
                         async(Dispatchers.IO) {
-                            val members = (queue.get("members") as List<String>).mapIndexed{ index, member ->
-                                val userData = firebaseFirestore.collection("users")
-                                    .document(member).get().await()
-                                Member(
-                                    member,
-                                    userData["nickname"] as String,
-                                    queue.getString("owner") == member,
-                                    getPhotoUrl((userData["photoPath"] ?: "") as String),
-                                    index
-                                )
-                            }
+                            val members =
+                                (queue.get("members") as List<String>).mapIndexed { index, member ->
+                                    val userData = firebaseFirestore.collection("users")
+                                        .document(member).get().await()
+                                    Member(
+                                        member,
+                                        userData["nickname"] as String,
+                                        queue.getString("owner") == member,
+                                        getPhotoUrl((userData["photoPath"] ?: "") as String),
+                                        !inactiveUsers.contains(member)
+                                    )
+                                }
                             val creator = if (members.isEmpty())
-                                Member("", "", false, "", 0)
+                                Member("", "", false, "", true)
                             else
                                 members.first { it.id == queue["owner"] }
                             Queue(
@@ -209,7 +253,8 @@ object QueueFirestoreDB {
                                 queue["description"] as String,
                                 members,
                                 queue["isStarted"] as Boolean,
-                                creator
+                                creator,
+                                inactiveUsers
                             )
                         }
                     }?.awaitAll()
@@ -293,7 +338,7 @@ object QueueFirestoreDB {
                 transaction.update(queueRef, "members", FieldValue.arrayUnion(userId))
             }.await()
             return@withContext Result.success(Unit)
-        } catch (e: Exception){
+        } catch (e: Exception) {
             _errorFlow.emit(e)
             return@withContext Result.failure(e)
         }
@@ -301,13 +346,13 @@ object QueueFirestoreDB {
     }
 
     suspend fun declineInvitation(queueId: String) = withContext(Dispatchers.IO) {
-        try{
+        try {
             val userId = currUser?.uid ?: throw NullPointerException("Пользователь не авторизован")
             val queueRef = firebaseFirestore.collection("queues").document(queueId)
 
             queueRef.update("invitations", FieldValue.arrayRemove(userId)).await()
             return@withContext Result.success(Unit)
-        } catch (e: Exception){
+        } catch (e: Exception) {
             _errorFlow.emit(e)
             return@withContext Result.failure(e)
         }

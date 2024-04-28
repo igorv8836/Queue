@@ -34,12 +34,14 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.example.queue.add_classes.Member
+import com.example.queue.add_classes.Queue
 import com.example.queue.viewmodel.QueueViewModel
 import kotlinx.coroutines.launch
 import org.burnoutcrew.reorderable.ReorderableItem
 import org.burnoutcrew.reorderable.detectReorderAfterLongPress
 import org.burnoutcrew.reorderable.rememberReorderableLazyListState
 import org.burnoutcrew.reorderable.reorderable
+
 
 @SuppressLint("CoroutineCreationDuringComposition")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -50,11 +52,11 @@ fun QueueFragmentMembers(viewModel: QueueViewModel) {
     val showingAddingDialog = remember { mutableStateOf(false) }
     val showDeletingDialog = remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
+    val userIdForDeleting = remember { mutableStateOf("") }
 
     val state = rememberReorderableLazyListState(
         onMove = { from, to ->
-            if (queue.members[from.index].id == userId)
-                viewModel.moveMember(from.index, to.index)
+            viewModel.moveMember(from.index, to.index)
         },
         onDragEnd = { from, to ->
             viewModel.endMoving(from, to)
@@ -62,7 +64,7 @@ fun QueueFragmentMembers(viewModel: QueueViewModel) {
     )
 
     AddingUserDialog(viewModel, showingAddingDialog)
-    UserDeletingDialog(viewModel = viewModel, showDeletingDialog = showDeletingDialog)
+    UserDeletingDialog(viewModel = viewModel, showDeletingDialog = showDeletingDialog, userIdForDeleting.value)
 
     Surface(
         shape = MaterialTheme.shapes.medium,
@@ -89,11 +91,13 @@ fun QueueFragmentMembers(viewModel: QueueViewModel) {
                         SwipeToDismissBoxValue.EndToStart -> {
                             coroutineScope.launch {
                                 dismissState.dismiss(SwipeToDismissBoxValue.Settled)
+                                viewModel.competeActionInQueue(user.id)
                             }
                         }
 
                         SwipeToDismissBoxValue.StartToEnd -> {
                             showDeletingDialog.value = true
+                            userIdForDeleting.value = user.id
                             coroutineScope.launch {
                                 dismissState.dismiss(SwipeToDismissBoxValue.Settled)
                             }
@@ -101,12 +105,12 @@ fun QueueFragmentMembers(viewModel: QueueViewModel) {
 
                         else -> Unit
                     }
-                    if (user.id == userId) {
+                    if ((user.id == userId || queue.owner.id == userId) && user.isActive) {
                         ReorderableItem(state, key = user.id) { isDragging ->
-                            SwipeDismissContent(user, dismissState)
+                            SwipeDismissContent(queue, userId, user, dismissState)
                         }
                     } else {
-                        SwipeDismissContent(user = user, dismissState = dismissState)
+                        SwipeDismissContent(queue, userId, user, dismissState)
                     }
 
                     HorizontalDivider(
@@ -120,7 +124,7 @@ fun QueueFragmentMembers(viewModel: QueueViewModel) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SwipeDismissContent(user: Member, dismissState: SwipeToDismissBoxState) {
+fun SwipeDismissContent(queue: Queue, curUser: String?, user: Member, dismissState: SwipeToDismissBoxState) {
     val (icon, alignment) = when (dismissState.targetValue) {
         SwipeToDismissBoxValue.StartToEnd -> Pair(Icons.Filled.Delete, Alignment.CenterStart)
         SwipeToDismissBoxValue.EndToStart -> Pair(Icons.Filled.Check, Alignment.CenterEnd)
@@ -151,10 +155,10 @@ fun SwipeDismissContent(user: Member, dismissState: SwipeToDismissBoxState) {
                 Icon(icon, "Icon", Modifier.scale(scale))
             }
         },
-        enableDismissFromEndToStart = true,
-        enableDismissFromStartToEnd = true,
+        enableDismissFromEndToStart = ((curUser == user.id || (curUser == queue.owner.id)) && queue.isStarted && user.isActive),
+        enableDismissFromStartToEnd = (curUser == queue.owner.id) && user.id != curUser,
         content = {
-            QueueMember(user = user)
+            QueueMember(user = user, !user.isActive)
         }
     )
 }

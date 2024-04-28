@@ -86,7 +86,7 @@ fun QueueItemCardPreview() {
         "name",
         true,
         "path",
-        10
+        true
     )
     QueueItemCard(
         Queue(

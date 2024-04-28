@@ -9,5 +9,5 @@ data class Member(
     val name: String,
     val isAdmin: Boolean,
     val imagePath: String,
-    val position: Int
+    val isActive: Boolean
     ) : Parcelable

@@ -23,10 +23,6 @@ class ProfileViewModel: ViewModel() {
     val email = _email.asStateFlow()
     private val _nickname = MutableStateFlow("")
     val nickname = _nickname.asStateFlow()
-    private val _image = MutableStateFlow<File?>(null)
-    val image = _image.asStateFlow()
-    private val _showAuth = MutableStateFlow(false)
-    val showAuth = _showAuth.asStateFlow()
     private val _photoFile = MutableStateFlow<File?>(null)
     val photoFile = _photoFile.asStateFlow()
     private val _invitations = MutableStateFlow<List<Invitation>>(emptyList())
@@ -66,7 +62,6 @@ class ProfileViewModel: ViewModel() {
 
     fun signOut(){
         accRep.signOut()
-        _showAuth.value = true
     }
 
     fun changePhoto(photoUri: Uri){

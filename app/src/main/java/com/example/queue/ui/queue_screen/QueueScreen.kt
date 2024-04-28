@@ -16,7 +16,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
-import com.example.queue.ui.navigation.RouteName
 import com.example.queue.viewmodel.QueueViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -39,7 +38,7 @@ fun QueueScreen(queueId: String?, viewModel: QueueViewModel, navController: NavC
 
     ) {
         Column(modifier = Modifier.padding(it)) {
-            QueueFragmentMainPart(viewModel = viewModel)
+            QueueFragmentMainPart(viewModel = viewModel, navController)
             QueueFragmentMembers(viewModel = viewModel)
         }
     }

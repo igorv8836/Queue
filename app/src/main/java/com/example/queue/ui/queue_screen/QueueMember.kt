@@ -17,6 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
@@ -25,7 +26,7 @@ import com.example.queue.add_classes.Member
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun QueueMember(user: Member) {
+fun QueueMember(user: Member, isInactive: Boolean = false) {
     val interactionSource = remember { MutableInteractionSource() }
     val indication = rememberRipple(bounded = true)
     Surface(
@@ -45,11 +46,13 @@ fun QueueMember(user: Member) {
                     .size(46.dp)
                     .clip(CircleShape)
                     .align(Alignment.CenterVertically),
-                contentScale = ContentScale.FillBounds
+                contentScale = ContentScale.FillBounds,
+                alpha = if (isInactive) 0.3f else 1f
             )
             Text(
                 text = user.name,
                 style = MaterialTheme.typography.bodyLarge,
+                color = if (isInactive) Color.LightGray else MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier
                     .padding(top = 8.dp, start = 8.dp)
                     .align(Alignment.Top).weight(1f)

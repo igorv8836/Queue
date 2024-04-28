@@ -23,7 +23,7 @@ fun RegisterScreen(navController: NavController, viewModel: AuthViewModel) {
     val toBaseScreen by viewModel.navigateToBaseFragment.collectAsState()
 
     if (toBaseScreen){
-        navController.navigate(RouteName.NEWS_SCREEN.value) {
+        navController.navigate(RouteName.MAIN_SCREEN.value) {
             popUpTo(navController.graph.startDestinationId) {
                 inclusive = true
             }

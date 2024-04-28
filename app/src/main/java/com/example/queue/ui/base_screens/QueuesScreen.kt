@@ -110,15 +110,15 @@ fun QueuesScreen(
                             .padding(it)
                     ) {
                         when (index) {
-                            0 -> items(myQueues) { queue ->
-                                QueueItemCard(queue) {
-                                    navController.navigate("${RouteName.QUEUE_SCREEN.value}/${queue.id}")
+                            0 -> items(myQueues) { it1 ->
+                                QueueItemCard(it1) {
+                                    navController.navigate("${RouteName.QUEUE_SCREEN.value}/${it1.id}")
                                 }
                             }
 
-                            1 -> items(queues) { queue ->
-                                QueueItemCard(queue) {
-                                    navController.navigate("${RouteName.QUEUE_SCREEN.value}/${queue.id}")
+                            1 -> items(queues) { it1 ->
+                                QueueItemCard(it1) {
+                                    navController.navigate("${RouteName.QUEUE_SCREEN.value}/${it1.id}")
                                 }
                             }
                         }
@@ -135,8 +135,4 @@ fun QueuesScreen(
 
         }
     }
-}
-
-fun generateItemList(): List<ListItem> {
-    return List(10) { ListItem("fda", "fdas") }
 }
