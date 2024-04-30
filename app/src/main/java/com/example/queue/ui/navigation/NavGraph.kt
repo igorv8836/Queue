@@ -16,7 +16,12 @@ import com.example.queue.ui.queue_screen.QueueScreen
 
 @Composable
 fun NavGraph(navHostController: NavHostController) {
-    NavHost(navController = navHostController, startDestination = RouteName.AUTH_SCREEN.value) {
+    NavHost(navController = navHostController, startDestination = "start") {
+
+        composable("start"){
+
+        }
+
         composable(RouteName.AUTH_SCREEN.value) {
             AuthScreen(navHostController)
         }

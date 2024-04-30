@@ -10,6 +10,8 @@ import kotlinx.coroutines.launch
 class NewsViewModel : ViewModel() {
     private val _newsData = MutableStateFlow<List<NewsItem>>(emptyList())
     val newsData = _newsData
+    private val _isLoading = MutableStateFlow(true)
+    val isLoading = _isLoading
     private val repository = FirestoreRepository
 
     init {
@@ -19,6 +21,7 @@ class NewsViewModel : ViewModel() {
     private fun loadNews() {
         viewModelScope.launch {
             repository.getNews().collect {
+                _isLoading.value = false
                 _newsData.value = it
             }
         }

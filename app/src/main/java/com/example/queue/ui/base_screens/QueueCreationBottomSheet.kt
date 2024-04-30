@@ -21,6 +21,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -89,16 +90,6 @@ fun QueueCreationBottomSheet(viewModel: QueuesViewModel, onExitClicked: () -> Un
                 MyTextField(hint = "Описание", dataText = description, lines = 5) {
                     description = it
                 }
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .width(300.dp),
-                    horizontalArrangement = Arrangement.SpaceEvenly
-                ) {
-                    QueueStatus("Закрытая", "Открытая", viewModel::changeQueueClosed)
-                    QueueStatus("Одноразовая", "Циклическая", viewModel::changeQueueSingleEvent)
-                }
             }
         }
     }
@@ -111,7 +102,7 @@ fun MyTextField(hint: String, dataText: String, lines: Int = 1, onTextChange: (S
     val interactionSource = remember { MutableInteractionSource() }
     val isTextFieldFocused by interactionSource.collectIsFocusedAsState()
 
-    TextField(
+    OutlinedTextField(
         value = dataText,
         onValueChange = { onTextChange(it) },
         label = { Text(hint) },
@@ -135,31 +126,4 @@ fun MyTextField(hint: String, dataText: String, lines: Int = 1, onTextChange: (S
             .fillMaxWidth()
             .padding(8.dp)
     )
-}
-
-@Composable
-fun QueueStatus(ableText: String, unableText: String, updateStatus: (Boolean) -> Unit) {
-    val isAble = rememberSaveable() { mutableStateOf(true) }
-    val surfaceColor by animateColorAsState(
-        if (!isAble.value) Color.Green else MaterialTheme.colorScheme.error,
-        label = ""
-    )
-    Surface(
-        shape = MaterialTheme.shapes.extraLarge,
-        shadowElevation = 4.dp,
-        color = surfaceColor,
-        modifier = Modifier
-            .animateContentSize()
-            .padding(8.dp)
-            .clickable {
-                isAble.value = !isAble.value
-                updateStatus(isAble.value)
-            }
-    ) {
-        Text(
-            text = if (isAble.value) ableText else unableText,
-            style = MaterialTheme.typography.bodyMedium,
-            modifier = Modifier.padding(8.dp)
-        )
-    }
 }

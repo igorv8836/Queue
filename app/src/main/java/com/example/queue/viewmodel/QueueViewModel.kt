@@ -114,7 +114,7 @@ class QueueViewModel : ViewModel() {
             if (startIndex == null)
                 startIndex = fromIndex
 
-            if (fromIndex <= toIndex || (userId.value == queue.value.owner.id)) {
+            if (startIndex!! <= toIndex || (userId.value == queue.value.owner.id)) {
                 val mutableMembers = _queue.value.members.toMutableList()
                 mutableMembers.add(toIndex, mutableMembers.removeAt(fromIndex))
                 _queue.value = _queue.value.copy(members = mutableMembers)

@@ -6,13 +6,17 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
@@ -51,10 +55,12 @@ fun SettingsScreen(viewModel: ProfileViewModel, navController: NavController) {
     val helpingText = viewModel.helpingText.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
+    val scrollState = rememberScrollState()
 
     LaunchedEffect(helpingText.value) {
         coroutineScope.launch {
-            snackbarHostState.showSnackbar(helpingText.value)
+            if (helpingText.value.isNotEmpty())
+                snackbarHostState.showSnackbar(helpingText.value)
         }
     }
 
@@ -77,12 +83,12 @@ fun SettingsScreen(viewModel: ProfileViewModel, navController: NavController) {
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         modifier = Modifier
-            .padding(start = Dimens.small, end = Dimens.small, top = Dimens.small)
+            .padding(top = Dimens.small)
     ) {
         Column(
             modifier = Modifier
                 .padding(it)
-                .fillMaxSize()
+                .fillMaxHeight()
         ) {
             GlideImage(
                 model = photoFile.value?.toURI().toString(),
@@ -138,10 +144,12 @@ fun SettingsScreen(viewModel: ProfileViewModel, navController: NavController) {
             Surface(
                 shape = RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp),
                 shadowElevation = 4.dp,
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .padding(horizontal = Dimens.small)
             ) {
                 Column(
-                    modifier = Modifier.padding(Dimens.small)
+                    modifier = Modifier.padding(Dimens.small).verticalScroll(scrollState)
                 ) {
                     SectionTitle(title = "Профиль")
                     SettingsItem("Приглашения") {

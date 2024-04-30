@@ -17,19 +17,30 @@ open class QueuesViewModel: ViewModel() {
     private val _errorText = MutableSharedFlow<String>()
     val errorText: SharedFlow<String> = _errorText.asSharedFlow()
     private val _queues = MutableStateFlow<List<Queue>>(emptyList())
-    open val queues = _queues.asStateFlow()
+    val queues = _queues.asStateFlow()
     private val _myQueues = MutableStateFlow<List<Queue>>(emptyList())
-    open val myQueues = _myQueues.asStateFlow()
+    val myQueues = _myQueues.asStateFlow()
+    private val _isLoading = MutableStateFlow(true)
+    val isLoading = _isLoading
 
-    val creationComplete = MutableStateFlow(false)
     private val _showLoading = MutableStateFlow(false)
     val showLoading = _showLoading.asStateFlow()
     private var _isQueueClosed = MutableStateFlow(true)
-    private var _isQueueSingleEvent = MutableStateFlow(true)
+
+    private val _showCreationSheet = MutableStateFlow(false)
+    val showCreationSheet: StateFlow<Boolean> = _showCreationSheet
 
     init {
         getErrorFlow()
         getQueuesData()
+    }
+
+    fun showCreationSheet() {
+        _showCreationSheet.value = true
+    }
+
+    fun hideCreationSheet() {
+        _showCreationSheet.value = false
     }
 
     private fun getErrorFlow(){
@@ -43,35 +54,21 @@ open class QueuesViewModel: ViewModel() {
     private fun getQueuesData(){
         viewModelScope.launch {
             repository.getQueues().collect{
+                _isLoading.value = false
                 _myQueues.value = it.first
                 _queues.value = it.second
             }
         }
     }
 
-    fun changeQueueClosed(isClosed: Boolean) {
-        _isQueueClosed.value = isClosed
-    }
-
-    fun changeQueueSingleEvent(isSingleEvent: Boolean) {
-        _isQueueSingleEvent.value = isSingleEvent
-    }
-
     fun createQueue(title: String, description: String) {
         _showLoading.value = true
         viewModelScope.launch {
-            val res = repository.createQueue(title, description, _isQueueClosed.value)
-            if (res.isSuccess) {
-                _showLoading.value = false
-                creationComplete.value = true
-            } else {
-                _showLoading.value = false
-                creationComplete.value = true
+            repository.createQueue(title, description, _isQueueClosed.value).exceptionOrNull()?.let {
+                _errorText.emit(it.message ?: "Error")
             }
+            _showLoading.value = false
+            hideCreationSheet()
         }
     }
-
-
 }
-
-data class QueueItem(val title: String, val description: String, val members: Int)

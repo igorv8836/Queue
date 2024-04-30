@@ -27,6 +27,8 @@ class ProfileViewModel: ViewModel() {
     val photoFile = _photoFile.asStateFlow()
     private val _invitations = MutableStateFlow<List<Invitation>>(emptyList())
     val invitations = _invitations.asStateFlow()
+    private val _isLoading = MutableStateFlow(true)
+    val isLoading = _isLoading
 
     init {
         getEmail()
@@ -98,6 +100,7 @@ class ProfileViewModel: ViewModel() {
                     _invitations.value = it
                 }
             }
+            _isLoading.value = false
         }
     }
 

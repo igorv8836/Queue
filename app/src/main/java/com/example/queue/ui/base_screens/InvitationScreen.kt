@@ -30,6 +30,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.queue.add_classes.Invitation
+import com.example.queue.ui.components.LoadingScreen
 import com.example.queue.viewmodel.ProfileViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -37,6 +38,7 @@ import com.example.queue.viewmodel.ProfileViewModel
 fun InvitationScreen(navController: NavController, viewModel: ProfileViewModel) {
     viewModel.getInvitations()
     val invitations by viewModel.invitations.collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState()
     Scaffold(
         topBar = {
             TopAppBar(
@@ -49,11 +51,16 @@ fun InvitationScreen(navController: NavController, viewModel: ProfileViewModel) 
             )
         }
     ) {
-        LazyColumn(modifier = Modifier.padding(it)) {
-            items(invitations) { invitation ->
-                InvitationItem(invitation, viewModel)
+        if (isLoading){
+            LoadingScreen()
+        } else {
+            LazyColumn(modifier = Modifier.padding(it)) {
+                items(invitations) { invitation ->
+                    InvitationItem(invitation, viewModel)
+                }
             }
         }
+
     }
 }
 

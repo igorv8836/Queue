@@ -27,10 +27,10 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
+import com.example.queue.ui.components.LoadingScreen
 import com.example.queue.ui.components.QueueItemCard
 import com.example.queue.ui.components.pagerTabIndicatorOffset
 import com.example.queue.ui.navigation.RouteName
-import com.example.queue.ui.queue_screen.draggable_list.ListItem
 import com.example.queue.viewmodel.QueuesViewModel
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
@@ -41,8 +41,7 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalPagerApi::class)
 @Composable
 fun QueuesScreen(
-    viewModel: QueuesViewModel,
-    navController: NavController
+    viewModel: QueuesViewModel, navController: NavController
 ) {
     val tabList = listOf("Мои", "Остальные")
     val pagerState = rememberPagerState()
@@ -50,82 +49,69 @@ fun QueuesScreen(
     val coroutineScope = rememberCoroutineScope()
     val myQueues by viewModel.myQueues.collectAsState()
     val queues by viewModel.queues.collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
 
-    var showCreationSheet by remember { mutableStateOf(false) }
+    val showCreationSheet by viewModel.showCreationSheet.collectAsState()
 
-    coroutineScope.launch {
-        viewModel.creationComplete.collect{
-            if (it)
-                showCreationSheet = false
-        }
-    }
 
-    if (showCreationSheet){
+    if (showCreationSheet) {
         QueueCreationBottomSheet(viewModel = viewModel) {
-            showCreationSheet = false
+            viewModel.hideCreationSheet()
         }
     }
 
     Column(modifier = Modifier.fillMaxSize()) {
-        Scaffold(
-            floatingActionButton = {
-                FloatingActionButton(onClick = {
-                    showCreationSheet = true
-                }) {
-                    Icon(imageVector = Icons.Filled.Add, contentDescription = "Add Queue")
-                }
-            },
-            snackbarHost = { SnackbarHost(snackbarHostState) }
-        ) {
+        Scaffold(floatingActionButton = {
+            FloatingActionButton(onClick = {
+                viewModel.showCreationSheet()
+            }) {
+                Icon(imageVector = Icons.Filled.Add, contentDescription = "Add Queue")
+            }
+        }, snackbarHost = { SnackbarHost(snackbarHostState) }) {
             Column(modifier = Modifier.padding(it)) {
-                TabRow(
-                    selectedTabIndex = tabIndex,
-                    indicator = { tabPositions ->
-                        TabRowDefaults.SecondaryIndicator(
-                            Modifier.pagerTabIndicatorOffset(pagerState, tabPositions)
-                        )
-                    }
-                ) {
+                TabRow(selectedTabIndex = tabIndex, indicator = { tabPositions ->
+                    TabRowDefaults.SecondaryIndicator(
+                        Modifier.pagerTabIndicatorOffset(pagerState, tabPositions)
+                    )
+                }) {
                     tabList.forEachIndexed { index, s ->
-                        Tab(
-                            selected = tabIndex == index,
-                            onClick = {
-                                coroutineScope.launch {
-                                    pagerState.animateScrollToPage(index)
-                                }
-                            },
-                            text = { Text(text = s) })
+                        Tab(selected = tabIndex == index, onClick = {
+                            coroutineScope.launch {
+                                pagerState.animateScrollToPage(index)
+                            }
+                        }, text = { Text(text = s) })
                     }
                 }
                 HorizontalPager(
-                    count = tabList.size,
-                    state = pagerState,
-                    modifier = Modifier.fillMaxSize()
+                    count = tabList.size, state = pagerState, modifier = Modifier.fillMaxSize()
                 ) { index ->
-                    LazyColumn(
-                        modifier = Modifier
-                            .weight(1f)
-                            .fillMaxSize()
-                            .padding(it)
-                    ) {
-                        when (index) {
-                            0 -> items(myQueues) { it1 ->
-                                QueueItemCard(it1) {
-                                    navController.navigate("${RouteName.QUEUE_SCREEN.value}/${it1.id}")
+                    if (!isLoading) {
+                        LazyColumn(
+                            modifier = Modifier
+                                .weight(1f)
+                                .fillMaxSize()
+                                .padding(it)
+                        ) {
+                            when (index) {
+                                0 -> items(myQueues) { it1 ->
+                                    QueueItemCard(it1) {
+                                        navController.navigate("${RouteName.QUEUE_SCREEN.value}/${it1.id}")
+                                    }
                                 }
-                            }
 
-                            1 -> items(queues) { it1 ->
-                                QueueItemCard(it1) {
-                                    navController.navigate("${RouteName.QUEUE_SCREEN.value}/${it1.id}")
+                                1 -> items(queues) { it1 ->
+                                    QueueItemCard(it1) {
+                                        navController.navigate("${RouteName.QUEUE_SCREEN.value}/${it1.id}")
+                                    }
                                 }
                             }
                         }
+                    } else {
+                        LoadingScreen()
                     }
                 }
             }
-
         }
 
         LaunchedEffect(key1 = true) {

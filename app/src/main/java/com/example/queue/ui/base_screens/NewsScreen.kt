@@ -1,21 +1,25 @@
 package com.example.queue.ui.base_screens
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.queue.ui.Dimens
+import com.example.queue.ui.components.LoadingScreen
 import com.example.queue.viewmodel.NewsViewModel
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -23,19 +27,24 @@ import java.util.Locale
 @Composable
 fun NewsScreen(viewModel: NewsViewModel) {
     val newsData by viewModel.newsData.collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState()
 
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(start = Dimens.small, end = Dimens.small)
-    ) {
-        items(newsData) { news ->
-            NewsItem(
-                title = news.title,
-                description = news.text,
-                date = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
-                    .format(news.date)
-            )
+    if (isLoading) {
+        LoadingScreen()
+    } else {
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(start = Dimens.small, end = Dimens.small)
+        ) {
+            items(newsData) { news ->
+                NewsItem(
+                    title = news.title,
+                    description = news.text,
+                    date = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
+                        .format(news.date)
+                )
+            }
         }
     }
 }

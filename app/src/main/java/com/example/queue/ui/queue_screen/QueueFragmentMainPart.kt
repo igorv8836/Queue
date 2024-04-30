@@ -1,10 +1,14 @@
 package com.example.queue.ui.queue_screen
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material3.AlertDialog
@@ -50,18 +54,31 @@ fun QueueFragmentMainPart(viewModel: QueueViewModel, navController: NavControlle
             .wrapContentHeight()
             .fillMaxWidth()
     ) {
-        Text(
-            text = queue.name,
-            style = MaterialTheme.typography.titleLarge,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 8.dp),
-            textAlign = TextAlign.Center,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis
-        )
-
-        Text(text = queue.members.size?.let { getCountText(it) } ?: "",
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Spacer(Modifier.weight(1f))
+            Text(
+                text = queue.name,
+                style = MaterialTheme.typography.titleLarge,
+                modifier = Modifier.padding(end = 8.dp),
+                textAlign = TextAlign.Center,
+                maxLines = 1
+            )
+            Box(
+                modifier = Modifier
+                    .padding()
+                    .size(12.dp)
+                    .align(Alignment.CenterVertically)
+                    .background(
+                        color = if (queue.isStarted) Color.Green else Color.Red,
+                        shape = MaterialTheme.shapes.small
+                    )
+            )
+            Spacer(Modifier.weight(1f))
+        }
+        Text(text = queue.members.size.let { getCountText(it) },
             style = MaterialTheme.typography.bodySmall,
             modifier = Modifier
                 .align(Alignment.CenterHorizontally)

@@ -21,10 +21,6 @@ fun BottomNavGraph(
             NewsScreen(viewModel())
         }
 
-        composable(RouteName.SEARCH_SCREEN.value) {
-
-        }
-
         composable(RouteName.QUEUES_SCREEN.value) {
             QueuesScreen(viewModel = viewModel(), navController = baseNavController)
         }

@@ -74,8 +74,10 @@ fun QueueFragmentMembers(viewModel: QueueViewModel) {
             .padding(8.dp)
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
-            PersonAddButton { showingAddingDialog.value = true }
-            HorizontalDivider(modifier = Modifier.padding(start = 8.dp, end = 8.dp))
+            if (userId == queue.owner.id) {
+                PersonAddButton { showingAddingDialog.value = true }
+                HorizontalDivider(modifier = Modifier.padding(start = 8.dp, end = 8.dp))
+            }
 
             LazyColumn(
                 state = state.listState,

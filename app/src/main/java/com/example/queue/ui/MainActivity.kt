@@ -19,13 +19,19 @@ class MainActivity : AppCompatActivity() {
         setContentView(ComposeView(this).apply {
             setContent {
                 MaterialTheme {
-                    val navController = rememberNavController()
-                    NavGraph(navHostController = navController)
-
                     val toMainScreen = viewModel.navigateToBaseFragment.collectAsState()
+                    val navController = rememberNavController()
+
+                    NavGraph(navHostController = navController)
 
                     if (toMainScreen.value) {
                         navController.navigate(RouteName.MAIN_SCREEN.value) {
+                            popUpTo(navController.graph.startDestinationId) {
+                                inclusive = true
+                            }
+                        }
+                    } else {
+                        navController.navigate(RouteName.AUTH_SCREEN.value) {
                             popUpTo(navController.graph.startDestinationId) {
                                 inclusive = true
                             }
