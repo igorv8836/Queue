@@ -87,7 +87,11 @@ class QueueViewModel : ViewModel() {
 
     fun competeActionInQueue(userId: String) {
         viewModelScope.launch {
-            queue.value.id?.let { queueRepository.completeActionInQueue(it, userId) }
+            queue.value.id?.let {
+                queueRepository.completeActionInQueue(it, userId)
+                if (queue.value.members.size >= 2 && userId == queue.value.members[0].id)
+                    queueRepository.sendNotification(queue.value.members[1].id, queue.value.name)
+            }
         }
     }
 

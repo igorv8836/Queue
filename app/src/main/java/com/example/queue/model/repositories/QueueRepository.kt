@@ -41,4 +41,11 @@ object QueueRepository {
 
     suspend fun completeActionInQueue(queueId: String, userId: String) =
         firestore.completeActionInQueue(queueId, userId)
+
+    suspend fun setNotificationToken(token: String) = firestore.setNotificationToken(token)
+
+    suspend fun sendNotification(userId: String, queueName: String) =
+        firestore.sendNotification(userId, queueName)
+
+    suspend fun setNotificationToken() = firestore.setNotificationToken()
 }

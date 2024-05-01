@@ -1,6 +1,11 @@
 package com.example.queue.model.firebase
 
 import android.annotation.SuppressLint
+import com.android.volley.Request
+import com.android.volley.Response
+import com.android.volley.toolbox.JsonObjectRequest
+import com.android.volley.toolbox.Volley
+import com.example.queue.App
 import com.example.queue.add_classes.Invitation
 import com.example.queue.add_classes.Member
 import com.example.queue.add_classes.Queue
@@ -9,6 +14,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
+import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.storage.storage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -22,6 +28,7 @@ import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
+import org.json.JSONObject
 
 object QueueFirestoreDB {
     @SuppressLint("StaticFieldLeak")
@@ -142,14 +149,14 @@ object QueueFirestoreDB {
             }
         }
 
-    suspend fun completeActionInQueue(queueId: String, userId: String){
-        withContext(Dispatchers.IO){
+    suspend fun completeActionInQueue(queueId: String, userId: String) {
+        withContext(Dispatchers.IO) {
             try {
-                firebaseFirestore.collection("queues")
-                    .document(queueId).update("completeUsers", FieldValue.arrayUnion(userId))
-                    .addOnCompleteListener {
-                        if (!it.isSuccessful)
-                            emitError(it.exception ?: Exception("Неизвестная ошибка"))
+                firebaseFirestore.collection("queues").document(queueId)
+                    .update("completeUsers", FieldValue.arrayUnion(userId)).addOnCompleteListener {
+                        if (!it.isSuccessful) emitError(
+                            it.exception ?: Exception("Неизвестная ошибка")
+                        )
                     }
             } catch (e: Exception) {
                 emitError(e)
@@ -157,14 +164,14 @@ object QueueFirestoreDB {
         }
     }
 
-    suspend fun cleanCompleteUsers(queueId: String){
-        withContext(Dispatchers.IO){
+    suspend fun cleanCompleteUsers(queueId: String) {
+        withContext(Dispatchers.IO) {
             try {
-                firebaseFirestore.collection("queues")
-                    .document(queueId).update("completeUsers", FieldValue.delete())
-                    .addOnCompleteListener {
-                        if (!it.isSuccessful)
-                            emitError(it.exception ?: Exception("Неизвестная ошибка"))
+                firebaseFirestore.collection("queues").document(queueId)
+                    .update("completeUsers", FieldValue.delete()).addOnCompleteListener {
+                        if (!it.isSuccessful) emitError(
+                            it.exception ?: Exception("Неизвестная ошибка")
+                        )
                     }
             } catch (e: Exception) {
                 emitError(e)
@@ -181,12 +188,14 @@ object QueueFirestoreDB {
                 }
                 launch {
                     try {
-                        val inactiveUsers = (snapshot?.get("completeUsers") as? List<String>) ?: emptyList()
+                        val inactiveUsers =
+                            (snapshot?.get("completeUsers") as? List<String>) ?: emptyList()
                         val queue = snapshot?.let {
                             val members =
                                 (snapshot.get("members") as List<String>).mapIndexed { index, member ->
-                                    val userData = firebaseFirestore.collection("users")
-                                        .document(member).get().await()
+                                    val userData =
+                                        firebaseFirestore.collection("users").document(member).get()
+                                            .await()
                                     Member(
                                         member,
                                         userData["nickname"] as String,
@@ -195,10 +204,8 @@ object QueueFirestoreDB {
                                         !inactiveUsers.contains(member)
                                     )
                                 }.sortedByDescending { it.isActive }
-                            val creator = if (members.isEmpty())
-                                Member("", "", false, "", true)
-                            else
-                                members.first { it.id == snapshot["owner"] }
+                            val creator = if (members.isEmpty()) Member("", "", false, "", true)
+                            else members.first { it.id == snapshot["owner"] }
                             Queue(
                                 snapshot.id,
                                 snapshot["name"] as String,
@@ -229,12 +236,14 @@ object QueueFirestoreDB {
 
                 launch {
                     val queues = snapshot?.documents?.map { queue ->
-                        val inactiveUsers = (queue.get("completeUsers") as? List<String>) ?: emptyList()
+                        val inactiveUsers =
+                            (queue.get("completeUsers") as? List<String>) ?: emptyList()
                         async(Dispatchers.IO) {
                             val members =
                                 (queue.get("members") as List<String>).mapIndexed { index, member ->
-                                    val userData = firebaseFirestore.collection("users")
-                                        .document(member).get().await()
+                                    val userData =
+                                        firebaseFirestore.collection("users").document(member).get()
+                                            .await()
                                     Member(
                                         member,
                                         userData["nickname"] as String,
@@ -243,10 +252,8 @@ object QueueFirestoreDB {
                                         !inactiveUsers.contains(member)
                                     )
                                 }
-                            val creator = if (members.isEmpty())
-                                Member("", "", false, "", true)
-                            else
-                                members.first { it.id == queue["owner"] }
+                            val creator = if (members.isEmpty()) Member("", "", false, "", true)
+                            else members.first { it.id == queue["owner"] }
                             Queue(
                                 queue.id,
                                 queue["name"] as String,
@@ -260,8 +267,7 @@ object QueueFirestoreDB {
                     }?.awaitAll()
 
                     val myQueue = queues?.filter { it.owner.id == currUser?.uid } ?: emptyList()
-                    val otherQueues =
-                        queues?.filter { it.owner.id != currUser?.uid } ?: emptyList()
+                    val otherQueues = queues?.filter { it.owner.id != currUser?.uid } ?: emptyList()
 
                     trySend(Pair(myQueue, otherQueues))
                 }
@@ -295,24 +301,23 @@ object QueueFirestoreDB {
             return@withContext Result.success(false)
         }
 
-        queueRef.collection("members")
-            .document(currUser?.uid ?: "").delete().await()
+        queueRef.collection("members").document(currUser?.uid ?: "").delete().await()
         return@withContext Result.success(true)
     }
 
     suspend fun changeIsStarting(queueId: String, isStarted: Boolean) =
         withContext(Dispatchers.IO) {
-            firebaseFirestore.collection("queues")
-                .document(queueId).update("isStarted", isStarted).await()
+            firebaseFirestore.collection("queues").document(queueId).update("isStarted", isStarted)
+                .await()
             return@withContext Result.success(true)
         }
 
     suspend fun sendInvitation(queueId: String, nickname: String): Result<Unit> {
         return try {
-            val userId = firebaseFirestore.collection("users")
-                .whereEqualTo("nickname", nickname).get().await().documents[0].id
-            firebaseFirestore.collection("queues")
-                .document(queueId)
+            val userId =
+                firebaseFirestore.collection("users").whereEqualTo("nickname", nickname).get()
+                    .await().documents[0].id
+            firebaseFirestore.collection("queues").document(queueId)
             val queueRef = firebaseFirestore.collection("queues").document(queueId)
             val updateData = mapOf("invitations" to FieldValue.arrayUnion(userId))
             queueRef.set(updateData, SetOptions.merge()).await()
@@ -358,4 +363,54 @@ object QueueFirestoreDB {
         }
 
     }
+
+    suspend fun setNotificationToken(token: String) = withContext(Dispatchers.IO) {
+        currUser?.uid?.let {
+            firebaseFirestore.collection("users").document(it).update("notificationToken", token)
+                .await()
+        }
+    }
+
+    suspend fun setNotificationToken(){
+        try{
+            FirebaseMessaging.getInstance().token.await().let {
+                setNotificationToken(it)
+            }
+        } catch (e: Exception){
+            emitError(e)
+        }
+    }
+
+    private suspend fun getNotificationToken(userId: String) =
+        firebaseFirestore.collection("users").document(userId).get().await()
+            .getString("notificationToken")
+
+    suspend fun sendNotification(
+        userId: String,
+        queueName: String
+    ): Request<JSONObject> =
+        withContext(Dispatchers.IO) {
+            val token = getNotificationToken(userId)
+            val url = "https://fcm.googleapis.com/fcm/send"
+            val requestBody = JSONObject().apply {
+                put("to", token)
+                put("priority", "high")
+                val notification = JSONObject().apply {
+                    put("title", "Твоя очередь")
+                    put("body", "Ты первый в очереди ${queueName}!")
+                }
+                put("notification", notification)
+            }
+            val requestQueue = Volley.newRequestQueue(App.instance)
+            val jsonObjectRequest =
+                object : JsonObjectRequest(Method.POST, url, requestBody, Response.Listener { _ ->
+                }, Response.ErrorListener { _ ->
+                }) {
+                    override fun getHeaders(): MutableMap<String, String> = hashMapOf(
+                        "Content-Type" to "application/json",
+                        "Authorization" to "key=AAAAFOcdaKI:APA91bGtlnaAmCJZGhlx2rLXk6bomsv5dNBvthwI1FiX82URfXYSH6uul6x0cO4n25ktrBWhSwTeDXHDHBUE6GBlMTFKlbtdu1BGjAgx7EP5p28wBK8H7kfQ9Uh3ZcpORH3H1zozxUd9"
+                    )
+                }
+            requestQueue.add(jsonObjectRequest)
+        }
 }
