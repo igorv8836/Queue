@@ -1,6 +1,5 @@
 package com.example.queue.model.firebase
 
-import android.annotation.SuppressLint
 import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.toolbox.JsonObjectRequest
@@ -30,8 +29,7 @@ import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
 
-object QueueFirestoreDB {
-    @SuppressLint("StaticFieldLeak")
+class QueueFirestoreDB {
     private val firebaseFirestore = FirebaseFirestore.getInstance()
     private val storageRef = Firebase.storage.reference
     private val currUser = FirebaseAuth.getInstance().currentUser

@@ -12,7 +12,7 @@ class NewsViewModel : ViewModel() {
     val newsData = _newsData
     private val _isLoading = MutableStateFlow(true)
     val isLoading = _isLoading
-    private val repository = FirestoreRepository
+    private val repository = FirestoreRepository()
 
     init {
         loadNews()

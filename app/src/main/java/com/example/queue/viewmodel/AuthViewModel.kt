@@ -15,7 +15,7 @@ class AuthViewModel : ViewModel() {
     val navigateToBaseFragment = _navigateToBaseFragment.asStateFlow()
     private val _helpingText = MutableSharedFlow<String?>()
     val helpingText = _helpingText.asSharedFlow()
-    private val accountRepository = AccountRepository
+    private val accountRepository = AccountRepository()
 
 
     fun signIn(email: String, password: String) {

@@ -7,7 +7,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 
-object FirebaseAccount {
+class FirebaseAccount {
     private val mAuth: FirebaseAuth = FirebaseAuth.getInstance()
 
     suspend fun registerAccount(email: String, password: String): Result<String?> =
@@ -32,13 +32,9 @@ object FirebaseAccount {
                 return@withContext Result.failure(IllegalArgumentException("Логин и пароль должны быть заполнены"))
             }
 
-            try {
+            return@withContext try {
                 mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener {
-                    if (it.isSuccessful) {
-                        Result.success(Unit)
-                    } else {
-                        it.exception?.let { it1 -> Result.failure(it1) }
-                    }
+                    it.exception?.let { it1 -> throw it1 }
                 }.await()
                 Result.success(Unit)
             } catch (e: Exception) {

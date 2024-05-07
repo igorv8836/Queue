@@ -11,6 +11,7 @@ import kotlinx.coroutines.launch
 
 class QueueFirebaseMessagingService : FirebaseMessagingService() {
     private val serviceScope = CoroutineScope(Dispatchers.IO + Job())
+    private val rep = QueueRepository()
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         super.onMessageReceived(remoteMessage)
@@ -29,7 +30,7 @@ class QueueFirebaseMessagingService : FirebaseMessagingService() {
     override fun onNewToken(token: String) {
         super.onNewToken(token)
         serviceScope.launch {
-            QueueRepository.setNotificationToken(token)
+            rep.setNotificationToken(token)
         }
     }
 

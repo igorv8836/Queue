@@ -2,8 +2,8 @@ package com.example.queue.model.repositories
 
 import com.example.queue.model.firebase.QueueFirestoreDB
 
-object QueueRepository {
-    private val firestore = QueueFirestoreDB
+class QueueRepository {
+    private val firestore = QueueFirestoreDB()
     suspend fun createQueue(
         name: String,
         description: String,

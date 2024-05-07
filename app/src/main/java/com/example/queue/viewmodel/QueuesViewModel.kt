@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 open class QueuesViewModel: ViewModel() {
-    private val repository = QueueRepository
+    private val repository = QueueRepository()
     private val _errorText = MutableSharedFlow<String>()
     val errorText: SharedFlow<String> = _errorText.asSharedFlow()
     private val _queues = MutableStateFlow<List<Queue>>(emptyList())

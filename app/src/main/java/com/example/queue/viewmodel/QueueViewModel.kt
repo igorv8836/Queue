@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class QueueViewModel : ViewModel() {
-    private val queueRepository = QueueRepository
+    private val queueRepository = QueueRepository()
     private val _queue = MutableStateFlow(Queue.getEmptyQueue())
     val queue = _queue.asStateFlow()
 

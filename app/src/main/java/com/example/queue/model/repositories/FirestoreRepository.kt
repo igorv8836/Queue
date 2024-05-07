@@ -5,8 +5,8 @@ import com.example.queue.model.firebase.FirestoreDB
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-object FirestoreRepository {
-    private val firestore = FirestoreDB
+class FirestoreRepository {
+    private val firestore = FirestoreDB()
     fun getNews() = firestore.getNews()
     suspend fun getNickname() = firestore.getNickname()
     suspend fun getUserImage() = withContext(Dispatchers.IO){

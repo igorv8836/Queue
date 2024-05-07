@@ -11,7 +11,7 @@ import kotlinx.coroutines.launch
 class MainViewModel: ViewModel() {
     private val _navigateToBaseFragment: MutableStateFlow<Boolean> = MutableStateFlow(false)
     val navigateToBaseFragment = _navigateToBaseFragment.asStateFlow()
-    private val accountRepository = AccountRepository
+    private val accountRepository = AccountRepository()
 
     init {
         checkAuth()
@@ -23,7 +23,7 @@ class MainViewModel: ViewModel() {
 
         if (res)
             viewModelScope.launch {
-                QueueRepository.setNotificationToken()
+                QueueRepository().setNotificationToken()
             }
 
     }

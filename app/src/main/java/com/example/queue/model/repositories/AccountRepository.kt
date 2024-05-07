@@ -5,9 +5,9 @@ import com.example.queue.model.firebase.FirestoreDB
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-object AccountRepository {
-    private val firebase = FirebaseAccount
-    private val firestore = FirestoreDB
+class AccountRepository {
+    private val firebase = FirebaseAccount()
+    private val firestore = FirestoreDB()
 
     suspend fun registerAccount(email: String, password: String, nickname: String): Result<Unit> =
         withContext(Dispatchers.Default) {
@@ -26,8 +26,10 @@ object AccountRepository {
             return@withContext Result.success(Unit)
         }
 
-    suspend fun signInAccount(email: String, password: String) =
-        firebase.signInAccount(email, password)
+    suspend fun signInAccount(email: String, password: String): Result<Unit> {
+        return firebase.signInAccount(email, password)
+    }
+
 
     suspend fun recoverPassword(email: String) = firebase.recoverPassword(email)
     fun checkAuth() = firebase.checkAuth()

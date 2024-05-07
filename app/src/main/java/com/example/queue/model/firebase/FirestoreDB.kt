@@ -2,7 +2,6 @@
 
 package com.example.queue.model.firebase
 
-import android.annotation.SuppressLint
 import android.net.Uri
 import android.provider.OpenableColumns
 import com.example.queue.App
@@ -23,13 +22,10 @@ import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import java.io.File
-import java.lang.IllegalArgumentException
 import java.util.Date
 import java.util.UUID
-import kotlin.NullPointerException
 
-object FirestoreDB {
-    @SuppressLint("StaticFieldLeak")
+class FirestoreDB {
     private val firebaseFirestore = FirebaseFirestore.getInstance()
     private val storageRef = Firebase.storage.reference
     private val currUser = FirebaseAuth.getInstance().currentUser

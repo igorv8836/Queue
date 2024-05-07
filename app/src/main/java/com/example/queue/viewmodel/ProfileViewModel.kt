@@ -13,9 +13,9 @@ import kotlinx.coroutines.launch
 import java.io.File
 
 class ProfileViewModel: ViewModel() {
-    private val firestoreRep = FirestoreRepository
-    private val accRep = AccountRepository
-    private val queueRep = QueueRepository
+    private val firestoreRep = FirestoreRepository()
+    private val accRep = AccountRepository()
+    private val queueRep = QueueRepository()
 
     private val _helpingText = MutableStateFlow("")
     val helpingText = _helpingText.asStateFlow()

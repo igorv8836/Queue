@@ -12,6 +12,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.window.DialogProperties
 
 @Composable
@@ -27,11 +28,12 @@ fun ChangePasswordDialog(
         Column {
             OutlinedTextField(value = lastPassword,
                 onValueChange = { lastPassword = it },
-                keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Password),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                 label = { Text("Введите старый пароль") })
             OutlinedTextField(value = newPassword,
                 onValueChange = { newPassword = it },
-                keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Password),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                visualTransformation = PasswordVisualTransformation(),
                 label = { Text("Введите новый пароль") })
         }
     }, confirmButton = {
