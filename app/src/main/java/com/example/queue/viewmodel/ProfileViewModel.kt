@@ -80,14 +80,18 @@ class ProfileViewModel: ViewModel() {
             val res = firestoreRep.changeNickname(nickname)
             if (res.isFailure)
                 _helpingText.value = res.exceptionOrNull()?.message ?: ""
+            else
+                _helpingText.value = "Никнейм успешно изменен"
         }
     }
 
-    fun changePassword(password: String){
+    fun changePassword(lastPassword: String, newPassword: String){
         viewModelScope.launch {
-            val res = accRep.changePassword(password)
+            val res = accRep.changePassword(lastPassword, newPassword)
             if (res.isFailure){
                 _helpingText.value = res.exceptionOrNull()?.message ?: ""
+            } else {
+                _helpingText.value = "Пароль успешно изменен"
             }
         }
     }

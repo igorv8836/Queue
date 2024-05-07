@@ -1,5 +1,7 @@
 package com.example.queue.model.firebase
 
+import android.util.Log
+import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.tasks.await
@@ -56,24 +58,32 @@ object FirebaseAccount {
         }
     }
 
-    suspend fun changePassword(password: String): Result<Unit> = withContext(Dispatchers.IO) {
-        if (password.isEmpty()) {
-            return@withContext Result.failure(IllegalArgumentException("Пароль не может быть пустым"))
+    suspend fun changePassword(lastPassword: String, newPassword: String): Result<Unit> =
+        withContext(Dispatchers.IO) {
+            if (newPassword.isEmpty() || lastPassword.isEmpty()) {
+                return@withContext Result.failure(IllegalArgumentException("Пароль не может быть пустым"))
+            }
+            val credential =
+                EmailAuthProvider.getCredential(mAuth.currentUser?.email!!, lastPassword)
+            try {
+                mAuth.currentUser!!.reauthenticate(credential).await()
+                mAuth.currentUser!!.updatePassword(newPassword).await()
+                return@withContext Result.success(Unit)
+            } catch (e: NullPointerException) {
+                return@withContext Result.failure(NullPointerException("Произошла критическая ошибка"))
+            } catch (e: Exception) {
+                return@withContext Result.failure(e)
+            }
         }
-
-        try {
-            mAuth.currentUser?.updatePassword(password)?.await()
-            Result.success(Unit)
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
-    }
 
     fun getEmail() = mAuth.currentUser?.email
 
     fun checkAuth() = mAuth.currentUser != null
     fun signOut() {
         mAuth.signOut()
+        val a = mAuth.currentUser
+        Log.i("test", a?.email.toString())
+        Log.i("test", a?.uid.toString())
     }
 }
 

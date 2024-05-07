@@ -31,7 +31,8 @@ object AccountRepository {
 
     suspend fun recoverPassword(email: String) = firebase.recoverPassword(email)
     fun checkAuth() = firebase.checkAuth()
-    suspend fun changePassword(password: String) = firebase.changePassword(password)
+    suspend fun changePassword(lastPassword: String, newPassword: String) =
+        firebase.changePassword(lastPassword, newPassword)
     fun signOut() = firebase.signOut()
 
     fun getEmail() = firebase.getEmail()

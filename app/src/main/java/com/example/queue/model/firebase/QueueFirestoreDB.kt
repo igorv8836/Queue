@@ -133,7 +133,7 @@ object QueueFirestoreDB {
     }
 
 
-    suspend fun addMember(queueId: String, userId: String, isAdmin: Boolean, position: Int) =
+    private suspend fun addMember(queueId: String, userId: String, isAdmin: Boolean, position: Int) =
         withContext(Dispatchers.IO) {
             try {
                 firebaseFirestore.collection("queues").document(queueId).collection("members")
@@ -179,7 +179,7 @@ object QueueFirestoreDB {
         }
     }
 
-    suspend fun getQueue(id: String) = channelFlow<Queue?> {
+    suspend fun getQueue(id: String) = channelFlow {
         val listener = firebaseFirestore.collection("queues").document(id)
             .addSnapshotListener { snapshot, error ->
                 if (error != null) {
@@ -192,7 +192,7 @@ object QueueFirestoreDB {
                             (snapshot?.get("completeUsers") as? List<String>) ?: emptyList()
                         val queue = snapshot?.let {
                             val members =
-                                (snapshot.get("members") as List<String>).mapIndexed { index, member ->
+                                (snapshot.get("members") as List<String>).mapIndexed { _, member ->
                                     val userData =
                                         firebaseFirestore.collection("users").document(member).get()
                                             .await()
@@ -240,7 +240,7 @@ object QueueFirestoreDB {
                             (queue.get("completeUsers") as? List<String>) ?: emptyList()
                         async(Dispatchers.IO) {
                             val members =
-                                (queue.get("members") as List<String>).mapIndexed { index, member ->
+                                (queue.get("members") as List<String>).mapIndexed { _, member ->
                                     val userData =
                                         firebaseFirestore.collection("users").document(member).get()
                                             .await()

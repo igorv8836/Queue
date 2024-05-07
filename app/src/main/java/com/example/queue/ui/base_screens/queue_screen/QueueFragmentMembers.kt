@@ -1,4 +1,4 @@
-package com.example.queue.ui.queue_screen
+package com.example.queue.ui.base_screens.queue_screen
 
 import android.annotation.SuppressLint
 import androidx.compose.animation.animateColorAsState
@@ -108,7 +108,7 @@ fun QueueFragmentMembers(viewModel: QueueViewModel) {
                         else -> Unit
                     }
                     if ((user.id == userId || queue.owner.id == userId) && user.isActive) {
-                        ReorderableItem(state, key = user.id) { isDragging ->
+                        ReorderableItem(state, key = user.id) { _ ->
                             SwipeDismissContent(queue, userId, user, dismissState)
                         }
                     } else {

@@ -31,8 +31,8 @@ fun BottomNavigation(navController: NavController?) {
         BottomItem.Screen3
     )
 
-    NavigationBar() {
-        listItems.forEachIndexed { index, item ->
+    NavigationBar {
+        listItems.forEachIndexed { _, item ->
             val interactionSource = remember { MutableInteractionSource() }
             val isSelected = item.route == currentRoute
             val iconColor = animateColorAsState(

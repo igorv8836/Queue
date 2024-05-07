@@ -1,4 +1,4 @@
-package com.example.queue.ui.base_screens
+package com.example.queue.ui.base_screens.profile_screen
 
 import android.net.Uri
 import android.os.Build
@@ -6,10 +6,8 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -19,7 +17,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -29,8 +26,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -57,6 +57,27 @@ fun SettingsScreen(viewModel: ProfileViewModel, navController: NavController) {
     val coroutineScope = rememberCoroutineScope()
     val scrollState = rememberScrollState()
 
+    var showNicknameDialog by remember { mutableStateOf(false) }
+    var showPasswordDialog by remember { mutableStateOf(false) }
+
+    if (showNicknameDialog) {
+        ProfileAdditionalDialog(
+            title = "Изменение никнейма",
+            textFieldLabel = "Введите новый никнейм",
+            denyRequest = { showNicknameDialog = false }) {
+            viewModel.changeNickname(it)
+            showNicknameDialog = false
+        }
+    }
+
+    if (showPasswordDialog) {
+        ChangePasswordDialog(
+            denyRequest = { showPasswordDialog = false }) { last, new ->
+            viewModel.changePassword(last, new)
+            showPasswordDialog = false
+        }
+    }
+
     LaunchedEffect(helpingText.value) {
         coroutineScope.launch {
             if (helpingText.value.isNotEmpty())
@@ -79,6 +100,8 @@ fun SettingsScreen(viewModel: ProfileViewModel, navController: NavController) {
             }
         }
     )
+
+
 
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
@@ -149,48 +172,25 @@ fun SettingsScreen(viewModel: ProfileViewModel, navController: NavController) {
                     .padding(horizontal = Dimens.small)
             ) {
                 Column(
-                    modifier = Modifier.padding(Dimens.small).verticalScroll(scrollState)
+                    modifier = Modifier
+                        .padding(Dimens.small)
+                        .verticalScroll(scrollState)
                 ) {
                     SectionTitle(title = "Профиль")
                     SettingsItem("Приглашения") {
                         navController.navigate(RouteName.INVITATION_SCREEN.value)
                     }
                     SectionTitle(title = "Настройки аккаунта")
-                    SettingsItem("Изменить никнейм")
-                    SettingsItem("Изменить пароль")
-                    SectionTitle(title = "Общие настройки")
-                    SettingsItem("Настройки")
+                    SettingsItem("Изменить никнейм") {
+                        showNicknameDialog = true
+                    }
+                    SettingsItem("Изменить пароль") {
+                        showPasswordDialog = true
+                    }
                 }
 
             }
         }
     }
 
-}
-
-@Composable
-fun SectionTitle(title: String) {
-    Text(
-        text = title,
-        style = MaterialTheme.typography.titleMedium,
-        modifier = Modifier.padding(top = Dimens.small)
-    )
-}
-
-@Composable
-fun SettingsItem(text: String, click: () -> Unit = {}) {
-    Text(
-        text = text,
-        style = MaterialTheme.typography.titleMedium.copy(color = MaterialTheme.colorScheme.primary),
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { click() }
-            .padding(top = Dimens.medium, bottom = Dimens.medium, start = Dimens.medium),
-        textAlign = TextAlign.Left
-    )
-    HorizontalDivider(
-        color = Color.Gray,
-        thickness = 1.dp,
-        modifier = Modifier.padding(start = Dimens.small)
-    )
 }

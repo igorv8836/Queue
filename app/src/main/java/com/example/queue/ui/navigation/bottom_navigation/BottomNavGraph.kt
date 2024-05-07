@@ -9,7 +9,7 @@ import androidx.navigation.compose.composable
 import com.example.queue.ui.base_screens.NewsScreen
 import com.example.queue.ui.base_screens.QueuesScreen
 import com.example.queue.ui.navigation.RouteName
-import com.example.queue.ui.base_screens.SettingsScreen
+import com.example.queue.ui.base_screens.profile_screen.SettingsScreen
 
 @Composable
 fun BottomNavGraph(

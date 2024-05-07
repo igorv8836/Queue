@@ -3,7 +3,6 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("com.google.gms.google-services")
-    id("kotlin-parcelize")
 }
 
 android {
@@ -22,11 +21,12 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            signingConfig = signingConfigs.getByName("debug")
         }
     }
 
@@ -56,11 +56,10 @@ dependencies {
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("com.google.android.material:material:1.11.0")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
-    implementation("androidx.legacy:legacy-support-v4:1.0.0")
 
     implementation("com.google.firebase:firebase-auth-ktx:22.3.1")
     implementation("com.google.firebase:firebase-firestore-ktx:24.11.1")
-    implementation(platform("com.google.firebase:firebase-bom:32.8.1"))
+    implementation(platform("com.google.firebase:firebase-bom:33.0.0"))
     implementation("com.google.firebase:firebase-analytics")
     implementation("com.google.firebase:firebase-firestore")
     implementation("com.google.firebase:firebase-storage")
@@ -81,8 +80,6 @@ dependencies {
 
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.7.0")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0")
-
-    implementation("com.squareup.picasso:picasso:2.71828")
 
     val composeBom = platform("androidx.compose:compose-bom:2024.03.00")
     implementation(composeBom)
@@ -105,7 +102,6 @@ dependencies {
 
     implementation("androidx.activity:activity-compose:1.9.0")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
-    implementation("androidx.compose.runtime:runtime-livedata")
 
     implementation("com.google.accompanist:accompanist-pager:$accompanist_version")
     implementation("com.google.accompanist:accompanist-pager-indicators:$accompanist_version")

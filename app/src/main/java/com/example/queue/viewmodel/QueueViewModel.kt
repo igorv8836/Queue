@@ -3,7 +3,6 @@ package com.example.queue.viewmodel
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.queue.add_classes.Member
 import com.example.queue.add_classes.Queue
 import com.example.queue.model.repositories.QueueRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,7 +16,7 @@ class QueueViewModel : ViewModel() {
 
     private val _userId = MutableStateFlow<String?>(null)
     val userId = _userId.asStateFlow()
-    private val _isDeleted = MutableStateFlow<Boolean>(false)
+    private val _isDeleted = MutableStateFlow(false)
     val isDeleted = _isDeleted.asStateFlow()
     private val _helpingText = MutableStateFlow<String?>(null)
     val helpingText = _helpingText.asStateFlow()
@@ -75,7 +74,7 @@ class QueueViewModel : ViewModel() {
 
      fun deleteUser(id: String){
          viewModelScope.launch {
-            val res = queueRepository.exitFromQueue(id)
+            queueRepository.exitFromQueue(id)
         }
      }
 

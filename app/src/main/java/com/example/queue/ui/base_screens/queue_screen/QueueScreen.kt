@@ -1,4 +1,4 @@
-package com.example.queue.ui.queue_screen
+package com.example.queue.ui.base_screens.queue_screen
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding

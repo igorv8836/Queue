@@ -1,4 +1,4 @@
-package com.example.queue.ui.queue_screen
+package com.example.queue.ui.base_screens.queue_screen
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource

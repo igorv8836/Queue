@@ -1,4 +1,4 @@
-package com.example.queue.ui.queue_screen
+package com.example.queue.ui.base_screens.queue_screen
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -17,7 +17,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
@@ -30,14 +29,18 @@ fun QueueMember(user: Member, isInactive: Boolean = false) {
     val interactionSource = remember { MutableInteractionSource() }
     val indication = rememberRipple(bounded = true)
     Surface(
-        modifier = Modifier.fillMaxWidth().clickable(
-            interactionSource = interactionSource,
-            indication = indication,
-            onClick = {  }
-        )
-    ){
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(
+                interactionSource = interactionSource,
+                indication = indication,
+                onClick = { }
+            )
+    ) {
         Row(
-            modifier = Modifier.padding(8.dp).fillMaxWidth()
+            modifier = Modifier
+                .padding(8.dp)
+                .fillMaxWidth()
         ) {
             GlideImage(
                 model = user.imagePath,
@@ -55,14 +58,17 @@ fun QueueMember(user: Member, isInactive: Boolean = false) {
                 color = if (isInactive) Color.LightGray else MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier
                     .padding(top = 8.dp, start = 8.dp)
-                    .align(Alignment.Top).weight(1f)
+                    .align(Alignment.Top)
+                    .weight(1f)
             )
-            if (user.isAdmin){
+            if (user.isAdmin) {
                 Text(
                     text = "Создатель",
                     style = MaterialTheme.typography.bodySmall,
                     color = Color.Gray,
-                    modifier = Modifier.align(Alignment.Top).padding(top = 4.dp, end = 8.dp)
+                    modifier = Modifier
+                        .align(Alignment.Top)
+                        .padding(top = 4.dp, end = 8.dp)
                 )
             }
         }

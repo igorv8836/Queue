@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package com.example.queue.model.firebase
 
 import android.annotation.SuppressLint
@@ -18,7 +20,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.channelFlow
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -32,7 +33,7 @@ object FirestoreDB {
     private val firebaseFirestore = FirebaseFirestore.getInstance()
     private val storageRef = Firebase.storage.reference
     private val currUser = FirebaseAuth.getInstance().currentUser
-    val errorChannel = MutableSharedFlow<Exception>()
+    private val errorChannel = MutableSharedFlow<Exception>()
 
     fun getNews(): Flow<List<NewsItem>> = callbackFlow {
         val collectionRef = firebaseFirestore.collection("news")
@@ -50,7 +51,7 @@ object FirestoreDB {
                     try {
                         NewsItem(
                             title = doc.getString("title") ?: "",
-                            text = doc.getString("text") ?: "",
+                            text = doc.getString("text")?.replace("\\n", "\n") ?: "",
                             date = doc.getTimestamp("date")?.toDate() ?: Date(0)
                         )
                     } catch (e: Exception) {

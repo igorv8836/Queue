@@ -1,4 +1,4 @@
-package com.example.queue.ui.auth_screen
+package com.example.queue.ui.base_screens.auth_screen
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
@@ -36,8 +36,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.queue.R
@@ -118,7 +116,7 @@ fun AuthScreen(navController: NavController) {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Image(
-                    painter = painterResource(id = R.drawable.main_icon),
+                    painter = painterResource(id = R.drawable.ic_launcher),
                     contentDescription = "App Icon",
                     modifier = Modifier
                         .padding(top = Dimens.large)

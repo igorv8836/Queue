@@ -1,4 +1,4 @@
-package com.example.queue.ui.auth_screen
+package com.example.queue.ui.base_screens.auth_screen
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.*

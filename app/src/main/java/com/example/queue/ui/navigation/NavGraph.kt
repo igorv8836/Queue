@@ -8,11 +8,11 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.example.queue.ui.auth_screen.AuthScreen
-import com.example.queue.ui.auth_screen.RegisterScreen
+import com.example.queue.ui.base_screens.auth_screen.AuthScreen
+import com.example.queue.ui.base_screens.auth_screen.RegisterScreen
 import com.example.queue.ui.base_screens.InvitationScreen
 import com.example.queue.ui.base_screens.MainScreen
-import com.example.queue.ui.queue_screen.QueueScreen
+import com.example.queue.ui.base_screens.queue_screen.QueueScreen
 
 @Composable
 fun NavGraph(navHostController: NavHostController) {
@@ -30,7 +30,7 @@ fun NavGraph(navHostController: NavHostController) {
             RegisterScreen(navController = navHostController, viewModel = viewModel())
         }
 
-        composable(RouteName.MAIN_SCREEN.value,) {
+        composable(RouteName.MAIN_SCREEN.value) {
             val bottomNavController = rememberNavController()
             MainScreen(navHostController, bottomNavController)
         }
