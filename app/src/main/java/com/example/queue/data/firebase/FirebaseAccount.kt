@@ -1,4 +1,4 @@
-package com.example.queue.model.firebase
+package com.example.queue.data.firebase
 
 import android.util.Log
 import com.google.firebase.auth.EmailAuthProvider
@@ -8,7 +8,14 @@ import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 
 class FirebaseAccount {
-    private val mAuth: FirebaseAuth = FirebaseAuth.getInstance()
+    private val mAuth: FirebaseAuth
+    constructor(){
+        mAuth = FirebaseAuth.getInstance()
+    }
+
+    constructor(firebaseAuth: FirebaseAuth) {
+        mAuth = firebaseAuth
+    }
 
     suspend fun registerAccount(email: String, password: String): Result<String?> =
         withContext(Dispatchers.IO) {
@@ -34,7 +41,7 @@ class FirebaseAccount {
 
             return@withContext try {
                 mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener {
-                    it.exception?.let { it1 -> throw it1 }
+                    it.exception?.let { it1 -> }
                 }.await()
                 Result.success(Unit)
             } catch (e: Exception) {

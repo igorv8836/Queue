@@ -16,7 +16,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
-import com.example.queue.viewmodel.QueueViewModel
+import com.example.queue.ui.viewmodel.QueueViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

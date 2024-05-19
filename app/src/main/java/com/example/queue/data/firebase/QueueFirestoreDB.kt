@@ -1,13 +1,13 @@
-package com.example.queue.model.firebase
+package com.example.queue.data.firebase
 
 import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
 import com.example.queue.App
-import com.example.queue.add_classes.Invitation
-import com.example.queue.add_classes.Member
-import com.example.queue.add_classes.Queue
+import com.example.queue.data.entities.Invitation
+import com.example.queue.data.entities.Member
+import com.example.queue.data.entities.Queue
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
@@ -102,7 +102,7 @@ class QueueFirestoreDB {
         }
 
     suspend fun createQueue(
-        name: String, description: String, isOpened: Boolean
+        name: String, description: String, isStarted: Boolean
     ) = withContext(Dispatchers.IO) {
         try {
             if (name.length < 3 || description.length < 3) throw Exception("Имя или описание слишком короткие, нужно больше 3 символов")
@@ -111,7 +111,7 @@ class QueueFirestoreDB {
                 mapOf(
                     "name" to name,
                     "description" to description,
-                    "isStarted" to isOpened,
+                    "isStarted" to isStarted,
                     "owner" to currUser?.uid,
                     "members" to listOf(currUser?.uid)
                 )

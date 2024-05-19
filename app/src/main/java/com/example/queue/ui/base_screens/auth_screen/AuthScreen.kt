@@ -41,7 +41,7 @@ import androidx.navigation.NavController
 import com.example.queue.R
 import com.example.queue.ui.Dimens
 import com.example.queue.ui.navigation.RouteName
-import com.example.queue.viewmodel.AuthViewModel
+import com.example.queue.ui.viewmodel.AuthViewModel
 
 @SuppressLint("RememberReturnType")
 @Composable

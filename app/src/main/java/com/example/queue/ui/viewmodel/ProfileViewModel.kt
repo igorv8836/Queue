@@ -1,12 +1,13 @@
-package com.example.queue.viewmodel
+package com.example.queue.ui.viewmodel
 
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.queue.add_classes.Invitation
-import com.example.queue.model.repositories.AccountRepository
-import com.example.queue.model.repositories.FirestoreRepository
-import com.example.queue.model.repositories.QueueRepository
+import com.example.queue.data.entities.Invitation
+import com.example.queue.data.firebase.QueueFirestoreDB
+import com.example.queue.domain.repositories.AccountRepository
+import com.example.queue.domain.repositories.FirestoreRepository
+import com.example.queue.domain.repositories.QueueRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -15,7 +16,7 @@ import java.io.File
 class ProfileViewModel: ViewModel() {
     private val firestoreRep = FirestoreRepository()
     private val accRep = AccountRepository()
-    private val queueRep = QueueRepository()
+    private val queueRep = QueueRepository(QueueFirestoreDB())
 
     private val _helpingText = MutableStateFlow("")
     val helpingText = _helpingText.asStateFlow()

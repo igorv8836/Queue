@@ -1,11 +1,11 @@
 @file:Suppress("DEPRECATION")
 
-package com.example.queue.model.firebase
+package com.example.queue.data.firebase
 
 import android.net.Uri
 import android.provider.OpenableColumns
 import com.example.queue.App
-import com.example.queue.add_classes.NewsItem
+import com.example.queue.data.entities.NewsItem
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore

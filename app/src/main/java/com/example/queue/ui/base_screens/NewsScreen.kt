@@ -17,7 +17,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.queue.ui.Dimens
 import com.example.queue.ui.components.LoadingScreen
-import com.example.queue.viewmodel.NewsViewModel
+import com.example.queue.ui.viewmodel.NewsViewModel
 import java.text.SimpleDateFormat
 import java.util.Locale
 

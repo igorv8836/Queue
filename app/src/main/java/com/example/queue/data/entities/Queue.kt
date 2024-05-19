@@ -1,4 +1,4 @@
-package com.example.queue.add_classes
+package com.example.queue.data.entities
 
 data class Queue(
     val id: String? = null,

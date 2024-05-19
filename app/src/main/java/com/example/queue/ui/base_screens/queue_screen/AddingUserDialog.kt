@@ -11,7 +11,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.window.DialogProperties
-import com.example.queue.viewmodel.QueueViewModel
+import com.example.queue.ui.viewmodel.QueueViewModel
 
 @Composable
 fun AddingUserDialog(viewModel: QueueViewModel, showingAddingDialog: MutableState<Boolean>) {

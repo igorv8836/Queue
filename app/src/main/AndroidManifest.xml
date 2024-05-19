@@ -35,7 +35,7 @@
         </activity>
 
         <service
-            android:name=".model.notification.QueueFirebaseMessagingService"
+            android:name=".data.notification.QueueFirebaseMessagingService"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />

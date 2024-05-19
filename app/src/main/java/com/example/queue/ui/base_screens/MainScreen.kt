@@ -7,6 +7,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.example.queue.ui.navigation.bottom_navigation.BottomNavGraph
@@ -16,7 +17,8 @@ import com.example.queue.ui.navigation.bottom_navigation.BottomNavigation
 fun MainScreen(navController: NavController, bottomNavController: NavHostController){
     MaterialTheme {
         Scaffold(
-            bottomBar = { BottomNavigation(bottomNavController) }
+            bottomBar = { BottomNavigation(bottomNavController) },
+            modifier = Modifier.testTag("main_screen")
         ) {
             Box(modifier = Modifier
                 .fillMaxSize()

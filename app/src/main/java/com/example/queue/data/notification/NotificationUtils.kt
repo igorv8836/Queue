@@ -1,4 +1,4 @@
-package com.example.queue.model.notification
+package com.example.queue.data.notification
 
 import android.app.NotificationChannel
 import android.app.NotificationManager

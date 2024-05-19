@@ -33,9 +33,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.example.queue.add_classes.Member
-import com.example.queue.add_classes.Queue
-import com.example.queue.viewmodel.QueueViewModel
+import com.example.queue.data.entities.Member
+import com.example.queue.data.entities.Queue
+import com.example.queue.ui.viewmodel.QueueViewModel
 import kotlinx.coroutines.launch
 import org.burnoutcrew.reorderable.ReorderableItem
 import org.burnoutcrew.reorderable.detectReorderAfterLongPress

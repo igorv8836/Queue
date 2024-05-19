@@ -30,7 +30,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.queue.R
-import com.example.queue.viewmodel.QueueViewModel
+import com.example.queue.ui.viewmodel.QueueViewModel
 
 @Composable
 fun QueueFragmentMainPart(viewModel: QueueViewModel, navController: NavController) {

@@ -1,7 +1,7 @@
-package com.example.queue.model.repositories
+package com.example.queue.domain.repositories
 
 import android.net.Uri
-import com.example.queue.model.firebase.FirestoreDB
+import com.example.queue.data.firebase.FirestoreDB
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 

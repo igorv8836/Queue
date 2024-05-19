@@ -1,16 +1,17 @@
-package com.example.queue.viewmodel
+package com.example.queue.ui.viewmodel
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.queue.add_classes.Queue
-import com.example.queue.model.repositories.QueueRepository
+import com.example.queue.data.entities.Queue
+import com.example.queue.data.firebase.QueueFirestoreDB
+import com.example.queue.domain.repositories.QueueRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class QueueViewModel : ViewModel() {
-    private val queueRepository = QueueRepository()
+    private val queueRepository = QueueRepository(QueueFirestoreDB())
     private val _queue = MutableStateFlow(Queue.getEmptyQueue())
     val queue = _queue.asStateFlow()
 

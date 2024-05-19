@@ -1,14 +1,13 @@
-package com.example.queue.model.repositories
+package com.example.queue.domain.repositories
 
-import com.example.queue.model.firebase.QueueFirestoreDB
+import com.example.queue.data.firebase.QueueFirestoreDB
 
-class QueueRepository {
-    private val firestore = QueueFirestoreDB()
+class QueueRepository(private val firestore: QueueFirestoreDB) {
     suspend fun createQueue(
         name: String,
         description: String,
-        isOpened: Boolean
-    ) = firestore.createQueue(name, description, isOpened)
+        isStarted: Boolean
+    ) = firestore.createQueue(name, description, isStarted)
 
     suspend fun getQueues() = firestore.getQueues()
 

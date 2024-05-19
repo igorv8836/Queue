@@ -6,7 +6,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.ui.graphics.Color
-import com.example.queue.viewmodel.QueueViewModel
+import com.example.queue.ui.viewmodel.QueueViewModel
 
 @Composable
 fun UserDeletingDialog(viewModel: QueueViewModel, showDeletingDialog: MutableState<Boolean>, userId: String) {

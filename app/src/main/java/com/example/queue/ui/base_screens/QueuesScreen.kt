@@ -29,7 +29,7 @@ import com.example.queue.ui.components.LoadingScreen
 import com.example.queue.ui.components.QueueItemCard
 import com.example.queue.ui.components.pagerTabIndicatorOffset
 import com.example.queue.ui.navigation.RouteName
-import com.example.queue.viewmodel.QueuesViewModel
+import com.example.queue.ui.viewmodel.QueuesViewModel
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState

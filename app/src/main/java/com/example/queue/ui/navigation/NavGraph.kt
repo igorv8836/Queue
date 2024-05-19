@@ -1,6 +1,8 @@
 package com.example.queue.ui.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -16,7 +18,8 @@ import com.example.queue.ui.base_screens.queue_screen.QueueScreen
 
 @Composable
 fun NavGraph(navHostController: NavHostController) {
-    NavHost(navController = navHostController, startDestination = "start") {
+    NavHost(navController = navHostController, startDestination = "start",
+        modifier = Modifier.testTag("nav_graph")) {
 
         composable("start"){
 

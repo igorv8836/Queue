@@ -21,7 +21,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
-import com.example.queue.add_classes.Member
+import com.example.queue.data.entities.Member
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable

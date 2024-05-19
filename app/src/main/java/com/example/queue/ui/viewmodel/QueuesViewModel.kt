@@ -1,9 +1,10 @@
-package com.example.queue.viewmodel
+package com.example.queue.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.queue.add_classes.Queue
-import com.example.queue.model.repositories.QueueRepository
+import com.example.queue.data.entities.Queue
+import com.example.queue.data.firebase.QueueFirestoreDB
+import com.example.queue.domain.repositories.QueueRepository
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -13,7 +14,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 open class QueuesViewModel: ViewModel() {
-    private val repository = QueueRepository()
+    private val repository = QueueRepository(QueueFirestoreDB())
     private val _errorText = MutableSharedFlow<String>()
     val errorText: SharedFlow<String> = _errorText.asSharedFlow()
     private val _queues = MutableStateFlow<List<Queue>>(emptyList())
@@ -25,7 +26,6 @@ open class QueuesViewModel: ViewModel() {
 
     private val _showLoading = MutableStateFlow(false)
     val showLoading = _showLoading.asStateFlow()
-    private var _isQueueClosed = MutableStateFlow(true)
 
     private val _showCreationSheet = MutableStateFlow(false)
     val showCreationSheet: StateFlow<Boolean> = _showCreationSheet
@@ -64,7 +64,7 @@ open class QueuesViewModel: ViewModel() {
     fun createQueue(title: String, description: String) {
         _showLoading.value = true
         viewModelScope.launch {
-            repository.createQueue(title, description, _isQueueClosed.value).exceptionOrNull()?.let {
+            repository.createQueue(title, description, false).exceptionOrNull()?.let {
                 _errorText.emit(it.message ?: "Error")
             }
             _showLoading.value = false

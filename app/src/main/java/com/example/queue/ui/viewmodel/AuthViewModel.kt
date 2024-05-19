@@ -1,8 +1,8 @@
-package com.example.queue.viewmodel
+package com.example.queue.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.queue.model.repositories.AccountRepository
+import com.example.queue.domain.repositories.AccountRepository
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -10,12 +10,23 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class AuthViewModel : ViewModel() {
+class AuthViewModel : ViewModel {
+    private val accountRepository: AccountRepository
+
+
+    constructor(){
+        accountRepository = AccountRepository()
+    }
+
+    constructor(accountRepository: AccountRepository) {
+        this.accountRepository = accountRepository
+    }
+
+
     private val _navigateToBaseFragment: MutableStateFlow<Boolean> = MutableStateFlow(false)
     val navigateToBaseFragment = _navigateToBaseFragment.asStateFlow()
     private val _helpingText = MutableSharedFlow<String?>()
     val helpingText = _helpingText.asSharedFlow()
-    private val accountRepository = AccountRepository()
 
 
     fun signIn(email: String, password: String) {

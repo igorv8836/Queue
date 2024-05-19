@@ -1,6 +1,7 @@
-package com.example.queue.model.notification
+package com.example.queue.data.notification
 
-import com.example.queue.model.repositories.QueueRepository
+import com.example.queue.data.firebase.QueueFirestoreDB
+import com.example.queue.domain.repositories.QueueRepository
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import kotlinx.coroutines.CoroutineScope
@@ -11,7 +12,7 @@ import kotlinx.coroutines.launch
 
 class QueueFirebaseMessagingService : FirebaseMessagingService() {
     private val serviceScope = CoroutineScope(Dispatchers.IO + Job())
-    private val rep = QueueRepository()
+    private val rep = QueueRepository(QueueFirestoreDB())
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         super.onMessageReceived(remoteMessage)

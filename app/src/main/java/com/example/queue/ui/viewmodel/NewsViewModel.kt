@@ -1,9 +1,9 @@
-package com.example.queue.viewmodel
+package com.example.queue.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.queue.add_classes.NewsItem
-import com.example.queue.model.repositories.FirestoreRepository
+import com.example.queue.data.entities.NewsItem
+import com.example.queue.domain.repositories.FirestoreRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 

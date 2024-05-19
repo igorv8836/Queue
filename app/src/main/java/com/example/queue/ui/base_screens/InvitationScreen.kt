@@ -27,9 +27,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.queue.add_classes.Invitation
+import com.example.queue.data.entities.Invitation
 import com.example.queue.ui.components.LoadingScreen
-import com.example.queue.viewmodel.ProfileViewModel
+import com.example.queue.ui.viewmodel.ProfileViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

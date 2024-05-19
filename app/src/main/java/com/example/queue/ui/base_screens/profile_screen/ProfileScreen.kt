@@ -43,7 +43,7 @@ import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.example.queue.ui.Dimens
 import com.example.queue.ui.navigation.RouteName
-import com.example.queue.viewmodel.ProfileViewModel
+import com.example.queue.ui.viewmodel.ProfileViewModel
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalGlideComposeApi::class)

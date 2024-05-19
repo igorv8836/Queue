@@ -1,9 +1,10 @@
-package com.example.queue.viewmodel
+package com.example.queue.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.queue.model.repositories.AccountRepository
-import com.example.queue.model.repositories.QueueRepository
+import com.example.queue.data.firebase.QueueFirestoreDB
+import com.example.queue.domain.repositories.AccountRepository
+import com.example.queue.domain.repositories.QueueRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -23,7 +24,7 @@ class MainViewModel: ViewModel() {
 
         if (res)
             viewModelScope.launch {
-                QueueRepository().setNotificationToken()
+                QueueRepository(QueueFirestoreDB()).setNotificationToken()
             }
 
     }

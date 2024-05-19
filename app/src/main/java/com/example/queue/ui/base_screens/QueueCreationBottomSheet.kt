@@ -33,7 +33,7 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import com.example.queue.R
 import com.example.queue.ui.components.TopLoadingBar
-import com.example.queue.viewmodel.QueuesViewModel
+import com.example.queue.ui.viewmodel.QueuesViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

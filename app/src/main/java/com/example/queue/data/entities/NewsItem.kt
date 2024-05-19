@@ -1,4 +1,4 @@
-package com.example.queue.add_classes
+package com.example.queue.data.entities
 
 import java.util.Date
 

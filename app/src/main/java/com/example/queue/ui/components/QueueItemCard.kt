@@ -21,8 +21,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.queue.R
-import com.example.queue.add_classes.Member
-import com.example.queue.add_classes.Queue
+import com.example.queue.data.entities.Member
+import com.example.queue.data.entities.Queue
 
 @Composable
 fun QueueItemCard(queue: Queue, onClick: (Queue) -> Unit) {

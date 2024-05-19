@@ -14,10 +14,10 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.compose.rememberNavController
-import com.example.queue.model.notification.NotificationUtils
+import com.example.queue.data.notification.NotificationUtils
 import com.example.queue.ui.navigation.NavGraph
 import com.example.queue.ui.navigation.RouteName
-import com.example.queue.viewmodel.MainViewModel
+import com.example.queue.ui.viewmodel.MainViewModel
 
 class MainActivity : AppCompatActivity() {
     private lateinit var viewModel: MainViewModel
