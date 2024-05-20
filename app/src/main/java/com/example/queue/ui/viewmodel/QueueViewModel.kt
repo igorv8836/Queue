@@ -75,7 +75,7 @@ class QueueViewModel : ViewModel() {
 
      fun deleteUser(id: String){
          viewModelScope.launch {
-            queueRepository.exitFromQueue(id)
+             queue.value.id?.let { queueRepository.exitFromQueue(it, id) }
         }
      }
 

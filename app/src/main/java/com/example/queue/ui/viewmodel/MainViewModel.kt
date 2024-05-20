@@ -13,9 +13,13 @@ class MainViewModel: ViewModel() {
     private val _navigateToBaseFragment: MutableStateFlow<Boolean> = MutableStateFlow(false)
     val navigateToBaseFragment = _navigateToBaseFragment.asStateFlow()
     private val accountRepository = AccountRepository()
+    private val queueRepository = QueueRepository(QueueFirestoreDB())
 
     init {
         checkAuth()
+        viewModelScope.launch {
+            queueRepository.getAndSetNotificationToken()
+        }
     }
 
     private fun checkAuth(){

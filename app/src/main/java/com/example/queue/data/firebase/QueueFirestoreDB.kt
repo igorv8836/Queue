@@ -8,6 +8,7 @@ import com.example.queue.App
 import com.example.queue.data.entities.Invitation
 import com.example.queue.data.entities.Member
 import com.example.queue.data.entities.Queue
+import com.example.queue.data.notification.QueueFirebaseMessagingService
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
@@ -282,7 +283,7 @@ class QueueFirestoreDB {
         return@withContext Result.success(res.isSuccessful)
     }
 
-    suspend fun exitFromQueue(queueId: String) = withContext(Dispatchers.IO) {
+    suspend fun exitFromQueue(queueId: String, userId: String? = null) = withContext(Dispatchers.IO) {
         val queueRef = firebaseFirestore.collection("queues").document(queueId)
 
         try {
@@ -291,7 +292,7 @@ class QueueFirestoreDB {
                 val members = queue["members"] as List<*>
 
                 if (members.contains(currUser?.uid)) {
-                    it.update(queueRef, "members", FieldValue.arrayRemove(currUser?.uid))
+                    it.update(queueRef, "members", FieldValue.arrayRemove(userId ?: currUser?.uid))
                 }
             }.await()
         } catch (e: Exception) {
@@ -362,11 +363,29 @@ class QueueFirestoreDB {
 
     }
 
-    suspend fun setNotificationToken(token: String) = withContext(Dispatchers.IO) {
-        currUser?.uid?.let {
-            firebaseFirestore.collection("users").document(it).update("notificationToken", token)
-                .await()
+    suspend fun getAndSetNotificationToken() = withContext(Dispatchers.IO){
+        try {
+            val token = FirebaseMessaging.getInstance().token.await()
+            token?.let { setNotificationToken(it) }
+            return@withContext Result.success(Unit)
+        } catch (e: Exception){
+            return@withContext Result.failure(e)
         }
+
+
+    }
+
+    suspend fun setNotificationToken(token: String) = withContext(Dispatchers.IO) {
+        try {
+            currUser?.uid?.let {
+                firebaseFirestore.collection("users").document(it).update("notificationToken", token)
+                    .await()
+            }
+            return@withContext Result.success(Unit)
+        } catch (e: Exception){
+            return@withContext Result.failure(e)
+        }
+
     }
 
     suspend fun setNotificationToken(){

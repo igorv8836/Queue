@@ -17,7 +17,7 @@ class QueueRepository(private val firestore: QueueFirestoreDB) {
 
     suspend fun deleteQueue(id: String) = firestore.deleteQueue(id)
 
-    suspend fun exitFromQueue(queueId: String) = firestore.exitFromQueue(queueId)
+    suspend fun exitFromQueue(queueId: String, userId: String? = null) = firestore.exitFromQueue(queueId, userId)
 
     suspend fun changeIsStarted(queueId: String, isStarted: Boolean) =
         firestore.changeIsStarting(queueId, isStarted)
@@ -42,6 +42,8 @@ class QueueRepository(private val firestore: QueueFirestoreDB) {
         firestore.completeActionInQueue(queueId, userId)
 
     suspend fun setNotificationToken(token: String) = firestore.setNotificationToken(token)
+
+    suspend fun getAndSetNotificationToken() = firestore.getAndSetNotificationToken()
 
     suspend fun sendNotification(userId: String, queueName: String) =
         firestore.sendNotification(userId, queueName)
