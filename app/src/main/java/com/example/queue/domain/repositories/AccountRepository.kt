@@ -1,4 +1,4 @@
-unpackage com.example.queue.domain.repositories
+package com.example.queue.domain.repositories
 
 import com.example.queue.data.firebase.FirebaseAccount
 import com.example.queue.data.firebase.FirestoreDB
