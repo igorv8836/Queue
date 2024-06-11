@@ -48,6 +48,7 @@
 * Работающий сервис Firebase
 
 ## Используемые технологии
+* Kotlin
 * MVVM
 * Design Material 3
 * Jetpack Compose
